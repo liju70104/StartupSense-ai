@@ -79,4 +79,4 @@ streamlit run frontend/app.py
 
 ## Developed By
 
-Liju
+Liju S
