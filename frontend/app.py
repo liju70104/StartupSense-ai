@@ -9,7 +9,7 @@ def get_base64(file_path):
         data = f.read()
     return base64.b64encode(data).decode()
 
-logo_base64 = get_base64("frontend/assets/logo.png")
+logo_base64 = get_base64("frontend/assets/LOGO.png")
 
 st.set_page_config(
     page_title="StartupSense-AI",
