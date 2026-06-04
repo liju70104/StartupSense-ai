@@ -4,6 +4,15 @@ import base64
 
 API_URL = "https://startupsense-ai-backend.onrender.com"
 
+def safe_json(response):
+    try:
+        return response.json()
+    except Exception:
+        return {
+            "success": False,
+            "message": "Backend is waking up or not responding. Please wait 30 seconds and try again."
+        }
+
 def get_base64(file_path):
     with open(file_path, "rb") as f:
         data = f.read()
@@ -211,7 +220,7 @@ with col3:
                     }
                 )
 
-                data = response.json()
+                data = safe_json(response)
 
                 if data["success"]:
                     st.success("Account created successfully. Now login.")
