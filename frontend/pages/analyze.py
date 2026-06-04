@@ -3,8 +3,7 @@ import streamlit as st
 import requests
 import plotly.graph_objects as go
 
-API_URL = "http://127.0.0.1:8000"
-
+API_URL = "https://startupsense-ai-backend.onrender.com"
 st.title("🚀 AI Startup Analyzer")
 st.markdown("### Analyze your startup idea using AI")
 
