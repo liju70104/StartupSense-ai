@@ -10,7 +10,7 @@ try:
     response = requests.get(f"{API_URL}/history")
 
     try:
-        data = response.json()
+       data = response.json()
     except Exception:
         data = {
             "success": False,
