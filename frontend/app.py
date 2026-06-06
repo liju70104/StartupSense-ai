@@ -12,7 +12,6 @@ def safe_json(response):
             "success": False,
             "message": "Backend is waking up or not responding. Please wait 30 seconds and try again."
         }
-
 def get_base64(file_path):
     with open(file_path, "rb") as f:
         data = f.read()
@@ -193,7 +192,7 @@ with col3:
                     json={"email": email, "password": password}
                 )
 
-                data = response.json()
+                data = safe_json(response)
 
                 if data["success"]:
                     st.session_state.logged_in = True
