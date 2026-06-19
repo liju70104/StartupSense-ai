@@ -5,11 +5,29 @@ API_URL = "https://startupsense-ai-backend.onrender.com"
 
 with open("frontend/assets/style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    
+
 st.title("📊 StartupSense-AI Dashboard")
 
 try:
-    response = requests.get(f"{API_URL}/dashboard")
+    response = requests.get(f"{API_URL}/dashboard", timeout=30)
+
+if response.status_code == 200:
+
+    data = response.json()
+
+    col1,col2,col3 = st.columns(3)
+
+    with col1:
+        st.metric("Total Ideas", data["total_ideas"])
+
+    with col2:
+        st.metric("Average Score", data["average_score"])
+
+    with col3:
+        st.metric("Highest Score", data["highest_score"])
+
+else:
+    st.error("Unable to load dashboard")
 
     try:
         data = response.json()

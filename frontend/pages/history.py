@@ -6,11 +6,24 @@ API_URL = "https://startupsense-ai-backend.onrender.com"
 
 with open("frontend/assets/style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    
+
 st.title("📜 Startup Idea History")
 
 try:
-    response = requests.get(f"{API_URL}/history")
+    response = requests.get(f"{API_URL}/history", timeout=30)
+
+if response.status_code == 200:
+    data = response.json()
+
+    history = data.get("history", [])
+
+    if len(history) == 0:
+        st.info("No startup ideas analyzed yet.")
+    else:
+        st.write(history)
+
+else:
+    st.error("Unable to fetch history.")
 
     try:
        data = safe_json(response)
