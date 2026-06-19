@@ -18,7 +18,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.write("")
+st.divider()
 
 try:
     response = requests.get(f"{API_URL}/dashboard", timeout=30)

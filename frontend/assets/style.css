@@ -1,86 +1,23 @@
-.main .block-container{
-    max-width:95%;
-    padding-top:2rem;
-}
-
-section[data-testid="stSidebar"]{
-    background:linear-gradient(
-        180deg,
-        #021B79,
-        #0575E6
-    );
-}
-
-section[data-testid="stSidebar"] *{
-    color:white !important;
-}
-.hero{
-    background:white;
-    border-radius:24px;
-    padding:40px;
-    text-align:center;
-
-    box-shadow:
-    0 10px 40px rgba(0,0,0,.08);
-
-    margin-bottom:30px;
-}
-
-.hero-title{
-    font-size:48px;
-    font-weight:800;
-    color:#0F172A;
-}
-
-.hero-subtitle{
-    font-size:18px;
-    color:#64748B;
-}
-.kpi-card{
-    background:white;
-
-    border-radius:24px;
-
-    padding:30px;
-
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.08);
-
-    transition:.3s;
-}
-
-.kpi-card:hover{
-    transform:translateY(-8px);
-}
-
-.kpi-label{
-    color:#64748B;
-    font-size:16px;
-}
-
-.kpi-value{
-    font-size:42px;
-    font-weight:800;
-    color:#2563EB;
-}
 .stApp {
-    background: linear-gradient(135deg, #eef6ff 0%, #dbeafe 45%, #ffffff 100%);
+    background: linear-gradient(135deg, #eef6ff 0%, #dbeafe 55%, #ffffff 100%);
     color: #0f172a;
+}
+
+.main .block-container,
+.block-container {
+    max-width: 92% !important;
+    padding-top: 2rem !important;
+    padding-left: 3rem !important;
+    padding-right: 3rem !important;
 }
 
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #071a3d, #123c86, #2563eb);
-    border-right: 1px solid rgba(255,255,255,0.15);
 }
 
 [data-testid="stSidebar"] * {
     color: white !important;
-    font-weight: 600;
-}
-
-.block-container {
-    padding-top: 3rem;
-    max-width: 1180px;
+    font-weight: 700;
 }
 
 h1, h2, h3 {
@@ -88,21 +25,19 @@ h1, h2, h3 {
     font-weight: 900 !important;
 }
 
-p, label {
-    color: #1e293b !important;
-}
-
 .hero {
-    padding: 55px 35px;
-    border-radius: 30px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(219,234,254,0.95));
+    width: 100%;
+    padding: 55px 40px;
+    border-radius: 32px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(219,234,254,0.98));
     border: 1px solid #bfdbfe;
     box-shadow: 0 24px 70px rgba(37,99,235,0.18);
     text-align: center;
+    margin-bottom: 30px;
 }
 
 .hero-title {
-    font-size: 64px;
+    font-size: 58px;
     font-weight: 950;
     background: linear-gradient(90deg, #1d4ed8, #2563eb, #60a5fa);
     -webkit-background-clip: text;
@@ -111,42 +46,36 @@ p, label {
 
 .hero-subtitle {
     font-size: 20px;
-    margin-top: 10px;
     color: #334155 !important;
 }
 
-.premium-card {
-    padding: 28px;
-    border-radius: 24px;
-    background: rgba(255,255,255,0.92);
+.premium-card,
+.kpi-card {
+    width: 100%;
+    padding: 30px;
+    border-radius: 26px;
+    background: rgba(255,255,255,0.95);
     border: 1px solid #bfdbfe;
-    box-shadow: 0 18px 45px rgba(37,99,235,0.14);
+    box-shadow: 0 18px 45px rgba(37,99,235,0.16);
     min-height: 160px;
 }
 
-.premium-card:hover {
+.premium-card:hover,
+.kpi-card:hover {
     transform: translateY(-6px);
     transition: 0.3s ease;
     box-shadow: 0 24px 60px rgba(37,99,235,0.25);
 }
 
-.kpi-card {
-    padding: 26px;
-    border-radius: 24px;
-    background: linear-gradient(135deg, #ffffff, #e0f2fe);
-    border: 1px solid #bfdbfe;
-    box-shadow: 0 18px 45px rgba(37,99,235,0.16);
-}
-
 .kpi-label {
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 800;
     color: #475569;
 }
 
 .kpi-value {
-    font-size: 42px;
-    font-weight: 900;
+    font-size: 48px;
+    font-weight: 950;
     color: #1d4ed8;
 }
 
@@ -157,19 +86,14 @@ p, label {
     color: white !important;
     font-weight: 800;
     border: none;
-    padding: 0.75rem;
-}
-
-.stButton button:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 24px rgba(37,99,235,0.45);
+    padding: 0.8rem;
 }
 
 .stTextInput input,
 .stTextArea textarea,
 .stSelectbox div {
     border-radius: 14px !important;
-    border: 1px solid #bfdbfe !important;
+    border: 1px solid #93c5fd !important;
     background: white !important;
     color: #0f172a !important;
 }
