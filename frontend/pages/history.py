@@ -12,39 +12,19 @@ st.title("📜 Startup Idea History")
 try:
     response = requests.get(f"{API_URL}/history", timeout=30)
 
-if response.status_code == 200:
-    data = response.json()
-
-    history = data.get("history", [])
-
-    if len(history) == 0:
-        st.info("No startup ideas analyzed yet.")
-    else:
-        st.write(history)
-
-else:
-    st.error("Unable to fetch history.")
-
-    try:
-       data = safe_json(response)
-    except Exception:
-        data = {
-            "success": False,
-            "message": "Backend is waking up. Please wait 30 seconds and refresh."
-        }
-
-    if data.get("success"):
+    if response.status_code == 200:
+        data = response.json()
 
         history = data.get("history", [])
 
         if len(history) == 0:
-            st.info("No startup ideas found yet.")
+            st.info("No startup ideas analyzed yet.")
         else:
             df = pd.DataFrame(history)
             st.dataframe(df, use_container_width=True)
 
     else:
-        st.warning(data.get("message", "Backend not connected."))
+        st.error("Unable to fetch history.")
 
 except Exception as e:
     st.error("Backend not connected or /history API missing.")
