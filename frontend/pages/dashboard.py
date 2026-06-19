@@ -3,10 +3,17 @@ import requests
 
 API_URL = "https://startupsense-ai-backend.onrender.com"
 
-with open("frontend/assets/style.css") as f:
+with open("frontend/assets/style.css", encoding="utf-8") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-st.title("📊 StartupSense-AI Dashboard")
+st.markdown("""
+<div class="hero">
+    <div class="hero-title">StartupSense-AI Dashboard</div>
+    <p class="hero-subtitle">Real-time analytics from your startup idea validation system.</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.write("")
 
 try:
     response = requests.get(f"{API_URL}/dashboard", timeout=30)
@@ -15,16 +22,65 @@ try:
         data = response.json()
 
         if data.get("success"):
+            total_ideas = data.get("total_ideas", 0)
+            average_score = data.get("average_score", 0)
+            highest_score = data.get("highest_score", 0)
+
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                st.metric("Total Ideas", data.get("total_ideas", 0))
+                st.markdown(f"""
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Startup Ideas</div>
+                    <div class="kpi-value">{total_ideas}</div>
+                    <p>Ideas analyzed using AI validation.</p>
+                </div>
+                """, unsafe_allow_html=True)
 
             with col2:
-                st.metric("Average Score", data.get("average_score", 0))
+                st.markdown(f"""
+                <div class="kpi-card">
+                    <div class="kpi-label">Average Score</div>
+                    <div class="kpi-value">{average_score}</div>
+                    <p>Overall average validation score.</p>
+                </div>
+                """, unsafe_allow_html=True)
 
             with col3:
-                st.metric("Highest Score", data.get("highest_score", 0))
+                st.markdown(f"""
+                <div class="kpi-card">
+                    <div class="kpi-label">Highest Score</div>
+                    <div class="kpi-value">{highest_score}</div>
+                    <p>Best performing startup idea score.</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.write("")
+
+            c1, c2 = st.columns(2)
+
+            with c1:
+                st.markdown("""
+                <div class="premium-card">
+                    <h3>📈 Analysis Overview</h3>
+                    <p>
+                    This dashboard summarizes all startup ideas submitted by users.
+                    It helps track idea quality, average performance, and top scores.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with c2:
+                st.markdown("""
+                <div class="premium-card">
+                    <h3>🚀 Project Status</h3>
+                    <p>
+                    Backend, MongoDB Atlas, API routes, and Streamlit frontend are connected
+                    successfully in the deployed version.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+
         else:
             st.warning(data.get("message", "Dashboard data not available."))
     else:

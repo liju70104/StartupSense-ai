@@ -5,11 +5,17 @@ import plotly.graph_objects as go
 
 API_URL = "https://startupsense-ai-backend.onrender.com"
 
-with open("frontend/assets/style.css") as f:
+with open("frontend/assets/style.css", encoding="utf-8") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    
-st.title("🚀 AI Startup Analyzer")
-st.markdown("### Analyze your startup idea using AI")
+
+st.markdown("""
+<div class="hero">
+    <div class="hero-title">AI Startup Analyzer</div>
+    <p class="hero-subtitle">Submit your startup idea and get AI-powered validation insights.</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.write("")
 
 startup_name = st.text_input("Startup Name")
 
@@ -52,12 +58,13 @@ if st.button("Analyze Startup"):
         try:
             response = requests.post(
                 f"{API_URL}/analyze",
-                json=data
+                json=data,
+                timeout=60
             )
 
             result = response.json()
 
-            if result["success"]:
+            if result.get("success"):
 
                 analysis = result["analysis"]
 
@@ -65,25 +72,31 @@ if st.button("Analyze Startup"):
 
                 col1, col2, col3 = st.columns(3)
 
-                col1.metric(
-                    "Overall Score",
-                    analysis["overall_score"]
-                )
+                with col1:
+                    st.markdown(f"""
+                    <div class="kpi-card">
+                        <div class="kpi-label">Overall Score</div>
+                        <div class="kpi-value">{analysis["overall_score"]}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
-                col2.metric(
-                    "Startup Status",
-                    analysis["status"]
-                )
+                with col2:
+                    st.markdown(f"""
+                    <div class="kpi-card">
+                        <div class="kpi-label">Startup Status</div>
+                        <div class="kpi-value" style="font-size:28px;">{analysis["status"]}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
-                col3.metric(
-                    "Risk Level",
-                    analysis["risk_level"]
-                )
+                with col3:
+                    st.markdown(f"""
+                    <div class="kpi-card">
+                        <div class="kpi-label">Risk Level</div>
+                        <div class="kpi-value" style="font-size:28px;">{analysis["risk_level"]}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
-                st.subheader("📌 Recommendation")
-                st.info(
-                    analysis["recommendation"]
-                )
+                st.write("")
 
                 labels = [
                     "Innovation",
@@ -110,35 +123,41 @@ if st.button("Analyze Startup"):
 
                 fig.update_layout(
                     title="Startup Analysis Scores",
-                    template="plotly_dark",
-                    yaxis=dict(range=[0, 100])
+                    yaxis=dict(range=[0, 100]),
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)"
                 )
 
-                st.plotly_chart(
-                    fig,
-                    use_container_width=True
-                )
+                st.plotly_chart(fig, use_container_width=True)
 
-                st.subheader("🤖 AI Business Analysis")
+                st.markdown(f"""
+                <div class="premium-card">
+                    <h3>Recommendation</h3>
+                    <p>{analysis["recommendation"]}</p>
+                </div>
+                """, unsafe_allow_html=True)
 
-                st.info(
-                    analysis["ai_analysis"]
-                )
+                st.write("")
 
-                report_text = json.dumps(
-                    analysis,
-                    indent=4
-                )
+                st.markdown("""
+                <div class="premium-card">
+                    <h3>AI Business Analysis</h3>
+                </div>
+                """, unsafe_allow_html=True)
+
+                st.info(analysis["ai_analysis"])
+
+                report_text = json.dumps(analysis, indent=4)
 
                 st.download_button(
-                    label="📄 Download Analysis Report",
+                    label="Download Analysis Report",
                     data=report_text,
                     file_name="startup_analysis_report.txt",
                     mime="text/plain"
                 )
 
             else:
-                st.error("Analysis failed. Please try again.")
+                st.error(result.get("message", "Analysis failed."))
 
         except Exception as e:
             st.error("Backend is not connected or analysis failed.")

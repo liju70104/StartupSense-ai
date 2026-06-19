@@ -10,11 +10,8 @@ st.set_page_config(
     layout="wide"
 )
 
-with open("frontend/assets/style.css") as f:
-    st.markdown(
-        f"<style>{f.read()}</style>",
-        unsafe_allow_html=True
-    )
+with open("frontend/assets/style.css", encoding="utf-8") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
 def safe_json(response):
@@ -44,14 +41,14 @@ st.markdown(
         content: "";
         position: fixed;
         top: 50%;
-        left: 50%;
-        width: 700px;
-        height: 700px;
+        left: 55%;
+        width: 620px;
+        height: 620px;
         transform: translate(-50%, -50%);
         background-image: url("data:image/png;base64,{logo_base64}");
+        background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        background-size: contain;
         opacity: 0.035;
         z-index: 0;
         pointer-events: none;
@@ -61,19 +58,16 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.sidebar.markdown(
-    """
-    # 🚀 StartupSense-AI
-    ### AI Startup Validation
+st.sidebar.markdown("""
+# 🚀 StartupSense-AI
+### Validate. Analyze. Launch.
 
-    **Navigation**
-    - Home
-    - Analyze
-    - Dashboard
-    - History
-    - Reports
-    """
-)
+**Built with**
+- FastAPI
+- Streamlit
+- MongoDB Atlas
+- Gemini AI
+""")
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -83,120 +77,93 @@ if "user" not in st.session_state:
 
 
 if st.session_state.logged_in:
-
-    st.markdown(
-        """
-        <div class="hero">
-            <div class="hero-title">Welcome Back</div>
-            <p class="hero-subtitle">
-                Continue validating startup ideas with AI-powered insights.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div class="hero">
+        <div class="hero-title">Welcome Back</div>
+        <p class="hero-subtitle">
+            Continue validating startup ideas with intelligent business insights.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.write("")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.markdown(
-            """
-            <div class="card">
-                <h3>🚀 Idea Analyzer</h3>
-                <p>Submit your startup idea and receive AI-powered validation scores.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("Open Analyzer", key="open_analyzer"):
+        st.markdown("""
+        <div class="premium-card">
+            <h3>🚀 Idea Analyzer</h3>
+            <p>Evaluate your startup idea with AI scoring, market insights, and SWOT analysis.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Analyzer"):
             st.switch_page("pages/analyze.py")
 
     with col2:
-        st.markdown(
-            """
-            <div class="card">
-                <h3>📊 Dashboard</h3>
-                <p>View startup analytics, score summaries, and performance metrics.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("Open Dashboard", key="open_dashboard"):
+        st.markdown("""
+        <div class="premium-card">
+            <h3>📊 Dashboard</h3>
+            <p>Track total ideas, average scores, highest performance, and analytics.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Dashboard"):
             st.switch_page("pages/dashboard.py")
 
     with col3:
-        st.markdown(
-            """
-            <div class="card">
-                <h3>📜 History</h3>
-                <p>Access previously analyzed startup ideas and saved results.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        if st.button("Open History", key="open_history"):
+        st.markdown("""
+        <div class="premium-card">
+            <h3>📜 History</h3>
+            <p>Review previously analyzed startup ideas and saved evaluation results.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open History"):
             st.switch_page("pages/history.py")
 
     st.write("")
 
-    if st.button("Logout", key="logout_btn"):
+    if st.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.user = None
         st.rerun()
 
-
 else:
-
-    st.markdown(
-        """
-        <div class="hero">
-            <div class="hero-title">StartupSense-AI</div>
-            <p class="hero-subtitle">
-                Validate. Analyze. Launch. Build smarter startup decisions with AI.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div class="hero">
+        <div class="hero-title">StartupSense-AI</div>
+        <p class="hero-subtitle">
+            AI-powered startup idea validation platform for smarter business decisions.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.write("")
 
     c1, c2, c3 = st.columns(3)
 
     with c1:
-        st.markdown(
-            """
-            <div class="card">
-                <h3>🤖 AI Analysis</h3>
-                <p>Generate SWOT insights, suggestions, and startup verdicts.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="premium-card">
+            <h3>🤖 AI Startup Analysis</h3>
+            <p>Generate AI-powered business validation, SWOT insights, and recommendations.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     with c2:
-        st.markdown(
-            """
-            <div class="card">
-                <h3>📈 Smart Analytics</h3>
-                <p>Track innovation, market, revenue, and competition scores.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="premium-card">
+            <h3>📈 Smart Analytics</h3>
+            <p>Track innovation, market potential, revenue model, and risk score.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     with c3:
-        st.markdown(
-            """
-            <div class="card">
-                <h3>☁️ Cloud Powered</h3>
-                <p>Built with FastAPI, MongoDB Atlas, Render, and Streamlit Cloud.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown("""
+        <div class="premium-card">
+            <h3>☁️ Cloud Deployment</h3>
+            <p>Full-stack cloud project using Streamlit, FastAPI, MongoDB Atlas, and Render.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     st.write("---")
 
@@ -204,11 +171,7 @@ else:
 
     with tab1:
         email = st.text_input("Email", key="login_email")
-        password = st.text_input(
-            "Password",
-            type="password",
-            key="login_password"
-        )
+        password = st.text_input("Password", type="password", key="login_password")
 
         if st.button("Login", key="login_btn"):
             if not email or not password:
@@ -216,12 +179,9 @@ else:
             else:
                 response = requests.post(
                     f"{API_URL}/login",
-                    json={
-                        "email": email,
-                        "password": password
-                    }
+                    json={"email": email, "password": password},
+                    timeout=30
                 )
-
                 data = safe_json(response)
 
                 if data.get("success"):
@@ -234,11 +194,7 @@ else:
     with tab2:
         name = st.text_input("Full Name", key="reg_name")
         reg_email = st.text_input("Email", key="reg_email")
-        reg_password = st.text_input(
-            "Password",
-            type="password",
-            key="reg_password"
-        )
+        reg_password = st.text_input("Password", type="password", key="reg_password")
 
         if st.button("Create Account", key="register_btn"):
             if not name or not reg_email or not reg_password:
@@ -250,9 +206,9 @@ else:
                         "name": name,
                         "email": reg_email,
                         "password": reg_password
-                    }
+                    },
+                    timeout=30
                 )
-
                 data = safe_json(response)
 
                 if data.get("success"):
