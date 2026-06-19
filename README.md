@@ -1,18 +1,35 @@
-## Screenshots
+## 📸 Screenshots
 
 ### Login Page
 ![Login UI](screenshots/Login_UI.png)
 
+### Analyze Page
+![Analyze UI](screenshots/Analyze_UI.png)
+
 ### Dashboard
 ![Dashboard UI](screenshots/Dashboard_UI.png)
 
-## System Design
+### History
+![History UI](screenshots/History_UI.png)
 
-### Architecture Diagram
-![Architecture](diagrams/Architecture.png)
+### Reports
+![Reports UI](screenshots/Reports_UI.png)
+
+## 🏗 System Design
+
+### System Architecture
+![System Architecture](diagrams/System Architecture Diagram.png)
 
 ### ER Diagram
-![ER Diagram](diagrams/ER_Diagram.png)
+![ER Diagram](diagrams/ER Diagram.png)
 
 ### Use Case Diagram
-![Use Case Diagram](diagrams/UseCase_Diagram.png)
+![Use Case Diagram](diagrams/Use Case Diagrams.png)
+
+## ☁️ Deployment & Database
+
+### Deployment
+![Deployment](docs/Deployment.png)
+
+### MongoDB Setup
+![MongoDB Setup](docs/MongoDB Setup.png)
