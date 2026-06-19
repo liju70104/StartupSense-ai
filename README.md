@@ -1,35 +1,19 @@
-# 📸 Screenshots
+![System Architecture](diagrams/System_Architecture_Diagram.png)
 
-## Login Page
-![Login UI](screenshots/Login_UI.png)
+![ER Diagram](diagrams/ER_Diagram.png)
 
-## Analyze Page
-![Analyze UI](screenshots/Analyze_UI.png)
+![Use Case Diagram](diagrams/Use_Case_Diagram.png)
 
-## Dashboard
-![Dashboard UI](screenshots/Dashboard_UI.png)
+![MongoDB Setup](docs/MongoDB_Setup.png)
 
-## History
-![History UI](screenshots/History_UI.png)
-
-## Reports
-![Reports UI](screenshots/Reports_UI.png)
-
-# 🏗️ System Design
-
-## System Architecture
-![System Architecture](diagrams/System%20Architecture%20Diagram.png)
-
-## ER Diagram
-![ER Diagram](diagrams/ER%20Diagram.png)
-
-## Use Case Diagram
-![Use Case Diagram](diagrams/Use%20Case%20Diagrams.png)
-
-# ☁️ Deployment
-
-## Deployment Screenshot
 ![Deployment](docs/Deployment.png)
 
-## MongoDB Atlas Setup
-![MongoDB Setup](docs/MongoDB%20Setup.png)
+![Login UI](screenshots/Login_UI.png)
+
+![Analyze UI](screenshots/Analyze_UI.png)
+
+![Dashboard UI](screenshots/Dashboard_UI.png)
+
+![History UI](screenshots/History_UI.png)
+
+![Reports UI](screenshots/Reports_UI.png)
