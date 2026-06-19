@@ -8,8 +8,13 @@ with open("frontend/assets/style.css", encoding="utf-8") as f:
 
 st.markdown("""
 <div class="hero">
-    <div class="hero-title">StartupSense-AI Dashboard</div>
-    <p class="hero-subtitle">Real-time analytics from your startup idea validation system.</p>
+    <div class="hero-title">
+        🚀 StartupSense-AI Dashboard
+    </div>
+
+    <div class="hero-subtitle">
+        Analyze • Validate • Launch
+    </div>
 </div>
 """, unsafe_allow_html=True)
 

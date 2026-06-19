@@ -7,7 +7,9 @@ API_URL = "https://startupsense-ai-backend.onrender.com"
 st.set_page_config(
     page_title="StartupSense-AI",
     page_icon="🚀",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 )
 
 with open("frontend/assets/style.css", encoding="utf-8") as f:
