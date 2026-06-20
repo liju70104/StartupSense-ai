@@ -1,19 +1,99 @@
-![System Architecture](diagrams/System_Architecture_Diagram.png)
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
+![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-red)
 
-![ER Diagram](diagrams/ER_Diagram.png)
+# 🚀 StartupSense-AI
 
-![Use Case Diagram](diagrams/Use_Case_Diagram.png)
+AI-Powered Startup Idea Validation Platform built using Streamlit, FastAPI, MongoDB Atlas, and Gemini AI.
 
-![MongoDB Setup](docs/MongoDB_Setup.png)
+---
 
-![Deployment](docs/Deployment.png)
+## 🌟 Live Demo
 
-![Login UI](screenshots/Login_UI.png)
+https://startupsense-ai-52.streamlit.app/
 
-![Analyze UI](screenshots/Analyze_UI.png)
+---
 
-![Dashboard UI](screenshots/Dashboard_UI.png)
+## ✨ Features
 
-![History UI](screenshots/History_UI.png)
+- 🔐 User Authentication
+- 🤖 AI Startup Analysis
+- 📊 Analytics Dashboard
+- 📜 Startup History Tracking
+- 📄 Report Generation
+- ☁️ Cloud Deployment
+- 🗄️ MongoDB Atlas Integration
+- ⚡ FastAPI Backend
+- 🎨 Premium Streamlit UI
 
-![Reports UI](screenshots/Reports_UI.png)
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- Streamlit
+- HTML
+- CSS
+
+### Backend
+- FastAPI
+- Python
+
+### Database
+- MongoDB Atlas
+
+### AI Engine
+- Gemini AI
+
+### Deployment
+- Streamlit Cloud
+- Render
+
+---
+
+## 📂 Project Structure
+
+```text
+StartupSense-AI
+│
+├── frontend
+├── backend
+├── diagrams
+├── docs
+├── screenshots
+├── requirements.txt
+└── README.md
+```
+
+## 📈 Modules
+
+### User Module
+- Register
+- Login
+- Logout
+
+### Startup Analysis
+- Idea Validation
+- SWOT Analysis
+- AI Recommendations
+
+### Dashboard
+- Total Ideas
+- Average Score
+- Highest Score
+
+### History
+- Previous Analyses
+- Saved Results
+
+### Reports
+- Download Analysis Reports
+
+---
+
+## 👨‍💻 Author
+
+Liju
+
+StartupSense-AI Project
