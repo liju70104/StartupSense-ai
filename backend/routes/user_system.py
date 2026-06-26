@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from datetime import datetime
 
 from backend.database import (
+    users,
     user_profiles,
     user_settings,
     notifications,
@@ -9,6 +10,8 @@ from backend.database import (
     system_logs,
     analysis_results
 )
+
+from backend.config import hash_password, verify_password
 
 router = APIRouter()
 
@@ -34,6 +37,7 @@ def get_profile(email: str = "demo@startupsense.ai"):
             "profile_photo": ""
         }
         user_profiles.insert_one(profile)
+        profile = user_profiles.find_one({"email": email})
 
     profile["_id"] = str(profile["_id"])
 
@@ -87,6 +91,7 @@ def get_settings(email: str = "demo@startupsense.ai"):
             "updated_at": now()
         }
         user_settings.insert_one(settings)
+        settings = user_settings.find_one({"email": email})
 
     settings["_id"] = str(settings["_id"])
 
@@ -115,9 +120,7 @@ def update_settings(data: dict):
 
 @router.get("/notifications")
 def get_notifications(email: str = "demo@startupsense.ai"):
-    items = list(
-        notifications.find({"email": email}).sort("created_at", -1)
-    )
+    items = list(notifications.find({"email": email}).sort("created_at", -1))
 
     if len(items) == 0:
         default_items = [
@@ -132,7 +135,7 @@ def get_notifications(email: str = "demo@startupsense.ai"):
             {
                 "email": email,
                 "title": "MongoDB synced",
-                "message": "MongoDB Atlas is storing your startup analyses.",
+                "message": "MongoDB Atlas is storing startup analysis records.",
                 "type": "database",
                 "read": False,
                 "created_at": now()
@@ -148,9 +151,7 @@ def get_notifications(email: str = "demo@startupsense.ai"):
         ]
 
         notifications.insert_many(default_items)
-        items = list(
-            notifications.find({"email": email}).sort("created_at", -1)
-        )
+        items = list(notifications.find({"email": email}).sort("created_at", -1))
 
     for item in items:
         item["_id"] = str(item["_id"])
@@ -211,7 +212,7 @@ def system_status():
             "mongodb": "Connected",
             "gemini": "Connected",
             "render": "Running",
-            "api_version": "1.0.0",
+            "api_version": "2.0.0",
             "records": total_records,
             "last_sync": now()
         }
@@ -221,6 +222,7 @@ def system_status():
 @router.post("/login-history")
 def add_login_history(data: dict):
     data["created_at"] = now()
+
     login_history.insert_one(data)
 
     return {
@@ -231,9 +233,7 @@ def add_login_history(data: dict):
 
 @router.get("/login-history")
 def get_login_history(email: str = "demo@startupsense.ai"):
-    items = list(
-        login_history.find({"email": email}).sort("created_at", -1)
-    )
+    items = list(login_history.find({"email": email}).sort("created_at", -1))
 
     for item in items:
         item["_id"] = str(item["_id"])
@@ -241,4 +241,134 @@ def get_login_history(email: str = "demo@startupsense.ai"):
     return {
         "success": True,
         "login_history": items
+    }
+
+
+@router.post("/change-password")
+def change_password(data: dict):
+    email = data.get("email")
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+
+    if not email or not current_password or not new_password:
+        return {
+            "success": False,
+            "message": "Email, current password, and new password are required"
+        }
+
+    existing_user = users.find_one({"email": email})
+
+    if not existing_user:
+        return {
+            "success": False,
+            "message": "User not found"
+        }
+
+    if not verify_password(current_password, existing_user["password"]):
+        return {
+            "success": False,
+            "message": "Current password is incorrect"
+        }
+
+    users.update_one(
+        {"email": email},
+        {"$set": {"password": hash_password(new_password)}}
+    )
+
+    user_profiles.update_one(
+        {"email": email},
+        {"$set": {"last_login": now()}}
+    )
+
+    system_logs.insert_one({
+        "email": email,
+        "action": "Password Changed",
+        "created_at": now()
+    })
+
+    notifications.insert_one({
+        "email": email,
+        "title": "Password changed",
+        "message": "Your account password was updated successfully.",
+        "type": "security",
+        "read": False,
+        "created_at": now()
+    })
+
+    return {
+        "success": True,
+        "message": "Password changed successfully"
+    }
+
+
+@router.post("/change-email")
+def change_email(data: dict):
+    old_email = data.get("old_email")
+    new_email = data.get("new_email")
+
+    if not old_email or not new_email:
+        return {
+            "success": False,
+            "message": "Old email and new email are required"
+        }
+
+    existing_user = users.find_one({"email": old_email})
+
+    if not existing_user:
+        return {
+            "success": False,
+            "message": "User not found"
+        }
+
+    email_taken = users.find_one({"email": new_email})
+
+    if email_taken:
+        return {
+            "success": False,
+            "message": "New email is already registered"
+        }
+
+    users.update_one(
+        {"email": old_email},
+        {"$set": {"email": new_email}}
+    )
+
+    user_profiles.update_one(
+        {"email": old_email},
+        {"$set": {"email": new_email, "updated_at": now()}}
+    )
+
+    user_settings.update_one(
+        {"email": old_email},
+        {"$set": {"email": new_email, "updated_at": now()}}
+    )
+
+    notifications.update_many(
+        {"email": old_email},
+        {"$set": {"email": new_email}}
+    )
+
+    login_history.update_many(
+        {"email": old_email},
+        {"$set": {"email": new_email}}
+    )
+
+    system_logs.insert_one({
+        "email": new_email,
+        "action": "Email Changed",
+        "created_at": now()
+    })
+
+    notifications.insert_one({
+        "email": new_email,
+        "title": "Email changed",
+        "message": "Your account email was updated successfully.",
+        "type": "security",
+        "read": False,
+        "created_at": now()
+    })
+
+    return {
+        "success": True,
+        "message": "Email changed successfully"
     }
