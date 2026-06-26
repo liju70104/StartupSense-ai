@@ -1,14 +1,14 @@
 from fastapi import APIRouter
+
 from backend.database import users
 from backend.models.user import UserRegister, UserLogin
 from backend.config import hash_password, verify_password
 
 router = APIRouter()
 
-# REGISTER API
+
 @router.post("/register")
 def register_user(user: UserRegister):
-
     existing_user = users.find_one({
         "email": user.email
     })
@@ -33,10 +33,8 @@ def register_user(user: UserRegister):
     }
 
 
-# LOGIN API
 @router.post("/login")
 def login_user(user: UserLogin):
-
     existing_user = users.find_one({
         "email": user.email
     })
@@ -47,10 +45,7 @@ def login_user(user: UserLogin):
             "message": "User not found"
         }
 
-    if not verify_password(
-        user.password,
-        existing_user["password"]
-    ):
+    if not verify_password(user.password, existing_user["password"]):
         return {
             "success": False,
             "message": "Incorrect password"

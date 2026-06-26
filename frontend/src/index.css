@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #070b18;
+  --bg-soft: #0d1326;
+  --card: rgba(255,255,255,0.08);
+  --card-strong: rgba(255,255,255,0.13);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: rgba(255,255,255,0.14);
+  --accent-blue: #38bdf8;
+  --accent-violet: #8b5cf6;
+  --accent-green: #22c55e;
+}
+
+.light {
+  --bg: #f8fbff;
+  --bg-soft: #eef6ff;
+  --card: rgba(255,255,255,0.92);
+  --card-strong: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border: rgba(37,99,235,0.18);
+  --accent-blue: #2563eb;
+  --accent-violet: #7c3aed;
+  --accent-green: #16a34a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+.glass-card {
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.22);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted-custom {
+  color: var(--text-muted);
+}
+
+.gradient-title {
+  background: linear-gradient(
+    90deg,
+    var(--text-primary),
+    var(--accent-blue),
+    var(--accent-violet)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

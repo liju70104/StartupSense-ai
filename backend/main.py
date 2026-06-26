@@ -25,8 +25,10 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(ideas_router)
 
+
 @app.get("/")
 def home():
     return {
+        "success": True,
         "message": "StartupSense-AI Backend Running"
     }
