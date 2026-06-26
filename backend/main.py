@@ -1,8 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routes.auth import router as auth_router
 from backend.routes.ideas import router as ideas_router
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="StartupSense-AI",
@@ -20,7 +20,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
 )
 
 app.include_router(auth_router)
