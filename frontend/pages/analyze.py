@@ -5,47 +5,78 @@ import plotly.graph_objects as go
 
 API_URL = "https://startupsense-ai-backend.onrender.com"
 
+st.set_page_config(
+    page_title="Analyze | StartupSense-AI",
+    page_icon="🚀",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 with open("frontend/assets/style.css", encoding="utf-8") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 st.markdown("""
-<div class="hero">
-    <div class="hero-title">AI Startup Analyzer</div>
-    <p class="hero-subtitle">Submit your startup idea and get AI-powered validation insights.</p>
+<div class="top-nav">
+    <div class="brand">🚀 StartupSense-AI Analyzer</div>
+    <div>
+        <span class="nav-pill">AI Scoring</span>
+        <span class="nav-pill">SWOT</span>
+        <span class="nav-pill">Report</span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-st.write("")
+st.markdown("""
+<div class="hero">
+    <div class="hero-title">Analyze Your Startup Idea</div>
+    <p class="hero-subtitle">
+        Enter your idea details and get AI-powered startup validation, scores, risks, and recommendations.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
-startup_name = st.text_input("Startup Name")
+col_left, col_right = st.columns([1.1, 0.9])
 
-industry = st.selectbox(
-    "Industry",
-    [
-        "Artificial Intelligence",
-        "FinTech",
-        "Healthcare",
-        "Education",
-        "E-Commerce",
-        "Cybersecurity",
-        "Social Media",
-        "Other"
-    ]
-)
+with col_left:
+    startup_name = st.text_input("Startup Name")
 
-problem = st.text_area("Problem Statement")
-solution = st.text_area("Your Solution")
-target_audience = st.text_input("Target Audience")
-revenue_model = st.text_input("Revenue Model")
-competitors = st.text_area("Competitors")
+    industry = st.selectbox(
+        "Industry",
+        [
+            "Artificial Intelligence",
+            "FinTech",
+            "Healthcare",
+            "Education",
+            "E-Commerce",
+            "Cybersecurity",
+            "Social Media",
+            "Other"
+        ]
+    )
 
-if st.button("Analyze Startup"):
+    problem = st.text_area("Problem Statement")
+    solution = st.text_area("Your Solution")
+    target_audience = st.text_input("Target Audience")
+    revenue_model = st.text_input("Revenue Model")
+    competitors = st.text_area("Competitors")
 
+with col_right:
+    st.markdown("""
+    <div class="premium-card">
+        <h3>What AI Evaluates</h3>
+        <p>• Innovation strength</p>
+        <p>• Market potential</p>
+        <p>• Revenue feasibility</p>
+        <p>• Competition level</p>
+        <p>• Risk and recommendation</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+if st.button("Analyze Startup", key="analyze_btn"):
     if not startup_name or not problem or not solution or not target_audience or not revenue_model or not competitors:
         st.warning("Please fill all fields before analyzing.")
-
     else:
-        data = {
+        payload = {
             "startup_name": startup_name,
             "industry": industry,
             "problem": problem,
@@ -56,96 +87,67 @@ if st.button("Analyze Startup"):
         }
 
         try:
-            response = requests.post(
-                f"{API_URL}/analyze",
-                json=data,
-                timeout=60
-            )
-
+            response = requests.post(f"{API_URL}/analyze", json=payload, timeout=60)
             result = response.json()
 
             if result.get("success"):
-
                 analysis = result["analysis"]
 
-                st.success("Analysis Completed Successfully")
+                st.success("Analysis completed successfully")
 
-                col1, col2, col3 = st.columns(3)
+                c1, c2, c3 = st.columns(3)
 
-                with col1:
+                with c1:
                     st.markdown(f"""
                     <div class="kpi-card">
                         <div class="kpi-label">Overall Score</div>
-                        <div class="kpi-value">{analysis["overall_score"]}</div>
+                        <div class="kpi-value">{analysis.get("overall_score", 0)}</div>
                     </div>
                     """, unsafe_allow_html=True)
 
-                with col2:
+                with c2:
                     st.markdown(f"""
                     <div class="kpi-card">
                         <div class="kpi-label">Startup Status</div>
-                        <div class="kpi-value" style="font-size:28px;">{analysis["status"]}</div>
+                        <div class="kpi-value" style="font-size:30px;">{analysis.get("status", "N/A")}</div>
                     </div>
                     """, unsafe_allow_html=True)
 
-                with col3:
+                with c3:
                     st.markdown(f"""
                     <div class="kpi-card">
                         <div class="kpi-label">Risk Level</div>
-                        <div class="kpi-value" style="font-size:28px;">{analysis["risk_level"]}</div>
+                        <div class="kpi-value" style="font-size:30px;">{analysis.get("risk_level", "N/A")}</div>
                     </div>
                     """, unsafe_allow_html=True)
 
-                st.write("")
-
-                labels = [
-                    "Innovation",
-                    "Market",
-                    "Revenue",
-                    "Competition"
-                ]
-
+                labels = ["Innovation", "Market", "Revenue", "Competition"]
                 values = [
-                    analysis["innovation_score"],
-                    analysis["market_score"],
-                    analysis["revenue_score"],
-                    analysis["competition_score"]
+                    analysis.get("innovation_score", 0),
+                    analysis.get("market_score", 0),
+                    analysis.get("revenue_score", 0),
+                    analysis.get("competition_score", 0)
                 ]
 
-                fig = go.Figure(
-                    data=[
-                        go.Bar(
-                            x=labels,
-                            y=values
-                        )
-                    ]
-                )
-
+                fig = go.Figure(data=[go.Bar(x=labels, y=values)])
                 fig.update_layout(
-                    title="Startup Analysis Scores",
+                    title="Startup Score Breakdown",
                     yaxis=dict(range=[0, 100]),
                     paper_bgcolor="rgba(0,0,0,0)",
-                    plot_bgcolor="rgba(0,0,0,0)"
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    height=420
                 )
 
                 st.plotly_chart(fig, use_container_width=True)
 
                 st.markdown(f"""
                 <div class="premium-card">
-                    <h3>Recommendation</h3>
-                    <p>{analysis["recommendation"]}</p>
+                    <h3>Final Recommendation</h3>
+                    <p>{analysis.get("recommendation", "No recommendation available.")}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-                st.write("")
-
-                st.markdown("""
-                <div class="premium-card">
-                    <h3>AI Business Analysis</h3>
-                </div>
-                """, unsafe_allow_html=True)
-
-                st.info(analysis["ai_analysis"])
+                st.info(analysis.get("ai_analysis", "AI analysis not available."))
 
                 report_text = json.dumps(analysis, indent=4)
 
@@ -155,7 +157,6 @@ if st.button("Analyze Startup"):
                     file_name="startup_analysis_report.txt",
                     mime="text/plain"
                 )
-
             else:
                 st.error(result.get("message", "Analysis failed."))
 

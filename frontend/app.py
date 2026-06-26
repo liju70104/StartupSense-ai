@@ -8,7 +8,7 @@ st.set_page_config(
     page_title="StartupSense-AI",
     page_icon="🚀",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 with open("frontend/assets/style.css", encoding="utf-8") as f:
@@ -25,51 +25,6 @@ def safe_json(response):
         }
 
 
-def get_base64(file_path):
-    try:
-        with open(file_path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-    except Exception:
-        return ""
-
-
-logo_base64 = get_base64("frontend/assets/LOGO.png")
-
-st.markdown(
-    f"""
-    <style>
-    [data-testid="stAppViewContainer"]::before {{
-        content: "";
-        position: fixed;
-        top: 50%;
-        left: 55%;
-        width: 620px;
-        height: 620px;
-        transform: translate(-50%, -50%);
-        background-image: url("data:image/png;base64,{logo_base64}");
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        opacity: 0.035;
-        z-index: 0;
-        pointer-events: none;
-    }}
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-st.sidebar.markdown("""
-# 🚀 StartupSense-AI
-### Validate. Analyze. Launch.
-
-**Built with**
-- FastAPI
-- Streamlit
-- MongoDB Atlas
-- Gemini AI
-""")
-
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
@@ -77,53 +32,74 @@ if "user" not in st.session_state:
     st.session_state.user = None
 
 
+st.markdown("""
+<div class="top-nav">
+    <div class="brand">🚀 StartupSense-AI</div>
+    <div>
+        <span class="nav-pill">AI Validation</span>
+        <span class="nav-pill">Analytics</span>
+        <span class="nav-pill">Reports</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
 if st.session_state.logged_in:
     st.markdown("""
     <div class="hero">
-        <div class="hero-title">Welcome Back</div>
+        <div class="hero-title">Your AI Startup Command Center</div>
         <p class="hero-subtitle">
-            Continue validating startup ideas with intelligent business insights.
+            Validate ideas, track performance, review history, and generate reports
+            from one modern SaaS-style workspace.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-    st.write("")
-
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         st.markdown("""
         <div class="premium-card">
-            <h3>🚀 Idea Analyzer</h3>
-            <p>Evaluate your startup idea with AI scoring, market insights, and SWOT analysis.</p>
+            <h3>🚀 Analyze</h3>
+            <p>Submit your idea and receive AI-powered business validation.</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Open Analyzer"):
+        if st.button("Open Analyze", key="go_analyze"):
             st.switch_page("pages/analyze.py")
 
     with col2:
         st.markdown("""
         <div class="premium-card">
             <h3>📊 Dashboard</h3>
-            <p>Track total ideas, average scores, highest performance, and analytics.</p>
+            <p>View startup scores, total ideas, and project analytics.</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Open Dashboard"):
+        if st.button("Open Dashboard", key="go_dashboard"):
             st.switch_page("pages/dashboard.py")
 
     with col3:
         st.markdown("""
         <div class="premium-card">
             <h3>📜 History</h3>
-            <p>Review previously analyzed startup ideas and saved evaluation results.</p>
+            <p>Review your previously analyzed startup ideas.</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Open History"):
+        if st.button("Open History", key="go_history"):
             st.switch_page("pages/history.py")
+
+    with col4:
+        st.markdown("""
+        <div class="premium-card">
+            <h3>📄 Reports</h3>
+            <p>Access report generation details and download-ready outputs.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Open Reports", key="go_reports"):
+            st.switch_page("pages/reports.py")
 
     st.write("")
 
-    if st.button("Logout"):
+    if st.button("Logout", key="logout_btn"):
         st.session_state.logged_in = False
         st.session_state.user = None
         st.rerun()
@@ -131,38 +107,37 @@ if st.session_state.logged_in:
 else:
     st.markdown("""
     <div class="hero">
-        <div class="hero-title">StartupSense-AI</div>
+        <div class="hero-title">Validate Startup Ideas with AI</div>
         <p class="hero-subtitle">
-            AI-powered startup idea validation platform for smarter business decisions.
+            StartupSense-AI helps students, founders, and innovators analyze business ideas
+            using AI scoring, market feasibility, SWOT-style insights, and dashboards.
         </p>
     </div>
     """, unsafe_allow_html=True)
-
-    st.write("")
 
     c1, c2, c3 = st.columns(3)
 
     with c1:
         st.markdown("""
         <div class="premium-card">
-            <h3>🤖 AI Startup Analysis</h3>
-            <p>Generate AI-powered business validation, SWOT insights, and recommendations.</p>
+            <h3>🤖 AI Business Insights</h3>
+            <p>Generate recommendations, risk levels, market potential, and final verdicts.</p>
         </div>
         """, unsafe_allow_html=True)
 
     with c2:
         st.markdown("""
         <div class="premium-card">
-            <h3>📈 Smart Analytics</h3>
-            <p>Track innovation, market potential, revenue model, and risk score.</p>
+            <h3>📈 SaaS Dashboard</h3>
+            <p>Track analyzed ideas, average scores, and highest performing startup concepts.</p>
         </div>
         """, unsafe_allow_html=True)
 
     with c3:
         st.markdown("""
         <div class="premium-card">
-            <h3>☁️ Cloud Deployment</h3>
-            <p>Full-stack cloud project using Streamlit, FastAPI, MongoDB Atlas, and Render.</p>
+            <h3>☁️ Full Stack Cloud</h3>
+            <p>Built with Streamlit, FastAPI, MongoDB Atlas, Render, and Streamlit Cloud.</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -175,22 +150,19 @@ else:
         password = st.text_input("Password", type="password", key="login_password")
 
         if st.button("Login", key="login_btn"):
-            if not email or not password:
-                st.warning("Please enter email and password.")
-            else:
-                response = requests.post(
-                    f"{API_URL}/login",
-                    json={"email": email, "password": password},
-                    timeout=30
-                )
-                data = safe_json(response)
+            response = requests.post(
+                f"{API_URL}/login",
+                json={"email": email, "password": password},
+                timeout=30
+            )
+            data = safe_json(response)
 
-                if data.get("success"):
-                    st.session_state.logged_in = True
-                    st.session_state.user = data.get("user")
-                    st.rerun()
-                else:
-                    st.error(data.get("message", "Login failed."))
+            if data.get("success"):
+                st.session_state.logged_in = True
+                st.session_state.user = data.get("user")
+                st.rerun()
+            else:
+                st.error(data.get("message", "Login failed."))
 
     with tab2:
         name = st.text_input("Full Name", key="reg_name")
@@ -198,21 +170,18 @@ else:
         reg_password = st.text_input("Password", type="password", key="reg_password")
 
         if st.button("Create Account", key="register_btn"):
-            if not name or not reg_email or not reg_password:
-                st.warning("Please fill all details.")
-            else:
-                response = requests.post(
-                    f"{API_URL}/register",
-                    json={
-                        "name": name,
-                        "email": reg_email,
-                        "password": reg_password
-                    },
-                    timeout=30
-                )
-                data = safe_json(response)
+            response = requests.post(
+                f"{API_URL}/register",
+                json={
+                    "name": name,
+                    "email": reg_email,
+                    "password": reg_password
+                },
+                timeout=30
+            )
+            data = safe_json(response)
 
-                if data.get("success"):
-                    st.success("Account created successfully. Now login.")
-                else:
-                    st.error(data.get("message", "Registration failed."))
+            if data.get("success"):
+                st.success("Account created successfully. Now login.")
+            else:
+                st.error(data.get("message", "Registration failed."))
