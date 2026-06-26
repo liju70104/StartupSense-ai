@@ -15,4 +15,10 @@ startup_ideas = db["startup_ideas"]
 analysis_results = db["analysis_results"]
 reports = db["reports"]
 
+user_profiles = db["user_profiles"]
+user_settings = db["user_settings"]
+notifications = db["notifications"]
+login_history = db["login_history"]
+system_logs = db["system_logs"]
+
 print("MongoDB Connected Successfully")
