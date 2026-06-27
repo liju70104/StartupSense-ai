@@ -16,7 +16,7 @@ export default function AppLayout({ activeTab, setActiveTab, children }) {
       <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(56,189,248,0.18),transparent_32%),radial-gradient(circle_at_85%_20%,rgba(139,92,246,0.20),transparent_30%)]" />
 
       <div className="mx-auto max-w-7xl px-6 py-6">
-        <Topbar />
+        <Topbar setActiveTab={setActiveTab} />
 
         <div className="glass-card mt-5 flex flex-wrap gap-3 p-3">
           {tabs.map((tab) => (

@@ -42,7 +42,7 @@ const fadeUp = {
   }),
 };
 
-export default function Dashboard() {
+export default function Dashboard({ setActiveTab }) {
   const [stats, setStats] = useState({
     total_ideas: 0,
     average_score: 0,
@@ -259,10 +259,10 @@ export default function Dashboard() {
 
         <Panel title="Quick actions" icon={Rocket}>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Quick icon={Sparkles} label="Analyze new idea" />
-            <Quick icon={FileText} label="Generate report" />
-            <Quick icon={Clock} label="Review history" />
-            <Quick icon={Activity} label="Check status" />
+            <Quick icon={Sparkles} label="Analyze new idea" onClick={() => setActiveTab("analyze")} />
+            <Quick icon={FileText} label="Generate report" onClick={() => setActiveTab("reports")} />
+            <Quick icon={Clock} label="Review history" onClick={() => setActiveTab("history")} />
+            <Quick icon={Activity} label="Check status" onClick={() => setActiveTab("settings")} />
           </div>
         </Panel>
       </div>
@@ -355,11 +355,12 @@ function Status({ icon: Icon, label, value }) {
   );
 }
 
-function Quick({ icon: Icon, label }) {
+function Quick({ icon: Icon, label, onClick }) {
   return (
     <button
       className="flex items-center gap-3 rounded-2xl border p-4 text-left transition hover:-translate-y-1"
       style={{ borderColor: "var(--border)", background: "var(--card)" }}
+      onClick={onClick}
     >
       <Icon className="h-5 w-5 text-[color:var(--accent-blue)]" />
       <span className="font-bold text-primary">{label}</span>
