@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Lock, Mail, Rocket } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "../../context/AuthContext.jsx";
 import Register from "./Register.jsx";
+
+const API_URL = "http://127.0.0.1:8000";
 
 export default function Login() {
   const { login, authLoading } = useAuth();
@@ -10,16 +13,61 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [resetEmail, setResetEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   if (mode === "register") {
     return <Register setMode={setMode} />;
   }
 
   const submit = async (e) => {
     e.preventDefault();
-
-    if (!email || !password) return;
-
+    if (!email || !password) {
+      toast.error("Enter email and password");
+      return;
+    }
     await login(email, password);
+  };
+
+  const resetPassword = async (e) => {
+    e.preventDefault();
+
+    if (!resetEmail || !newPassword || !confirmPassword) {
+      toast.error("Fill all fields");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: resetEmail,
+          new_password: newPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success(data.message);
+        setMode("login");
+        setEmail(resetEmail);
+        setPassword("");
+      } else {
+        toast.error(data.message);
+      }
+    } catch {
+      toast.error("Backend not connected");
+    }
   };
 
   return (
@@ -38,7 +86,7 @@ export default function Login() {
 
           <p className="mt-5 text-lg leading-8 text-secondary">
             Login to your AI startup validation command center and continue
-            analyzing business ideas, reports, and insights.
+            analyzing ideas, reports, dashboards, and insights.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -48,50 +96,112 @@ export default function Login() {
           </div>
         </section>
 
-        <form onSubmit={submit} className="glass-card p-8">
-          <h2 className="font-display text-4xl font-extrabold text-primary">
-            Welcome Back
-          </h2>
-          <p className="mt-2 text-secondary">
-            Enter your account details to continue.
-          </p>
+        {mode === "forgot" ? (
+          <form onSubmit={resetPassword} className="glass-card p-8">
+            <h2 className="font-display text-4xl font-extrabold text-primary">
+              Reset Password
+            </h2>
+            <p className="mt-2 text-secondary">
+              Enter your registered email and create a new password.
+            </p>
 
-          <div className="mt-8 space-y-4">
-            <Input
-              icon={Mail}
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={setEmail}
-            />
+            <div className="mt-8 space-y-4">
+              <Input
+                icon={Mail}
+                type="email"
+                placeholder="Registered email address"
+                value={resetEmail}
+                onChange={setResetEmail}
+              />
 
-            <Input
-              icon={Lock}
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={setPassword}
-            />
+              <Input
+                icon={Lock}
+                type="password"
+                placeholder="New password"
+                value={newPassword}
+                onChange={setNewPassword}
+              />
 
-            <button
-              disabled={authLoading}
-              className="w-full rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-4 font-extrabold text-white disabled:opacity-50"
-            >
-              {authLoading ? "Logging in..." : "Login"}
-            </button>
-          </div>
+              <Input
+                icon={Lock}
+                type="password"
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+              />
 
-          <p className="mt-6 text-center text-secondary">
-            New to StartupSense-AI?{" "}
-            <button
-              type="button"
-              onClick={() => setMode("register")}
-              className="font-bold text-[color:var(--accent-blue)]"
-            >
-              Create account
-            </button>
-          </p>
-        </form>
+              <button className="w-full rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-4 font-extrabold text-white">
+                Reset Password
+              </button>
+            </div>
+
+            <p className="mt-6 text-center text-secondary">
+              Remember your password?{" "}
+              <button
+                type="button"
+                onClick={() => setMode("login")}
+                className="font-bold text-[color:var(--accent-blue)]"
+              >
+                Back to Login
+              </button>
+            </p>
+          </form>
+        ) : (
+          <form onSubmit={submit} className="glass-card p-8">
+            <h2 className="font-display text-4xl font-extrabold text-primary">
+              Welcome Back
+            </h2>
+            <p className="mt-2 text-secondary">
+              Enter your account details to continue.
+            </p>
+
+            <div className="mt-8 space-y-4">
+              <Input
+                icon={Mail}
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={setEmail}
+              />
+
+              <Input
+                icon={Lock}
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={setPassword}
+              />
+
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => setMode("forgot")}
+                  className="text-sm font-bold text-[color:var(--accent-blue)]"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+
+              <button
+                disabled={authLoading}
+                className="w-full rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-4 font-extrabold text-white disabled:opacity-50"
+              >
+                {authLoading ? "Logging in..." : "Login"}
+              </button>
+            </div>
+
+            <p className="mt-6 text-center text-secondary">
+              New to StartupSense-AI?{" "}
+              <button
+                type="button"
+                onClick={() => setMode("register")}
+                className="font-bold text-[color:var(--accent-blue)]"
+              >
+                Create account
+              </button>
+            </p>
+          </form>
+        )}
       </div>
     </div>
   );

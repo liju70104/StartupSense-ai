@@ -9,9 +9,7 @@ router = APIRouter()
 
 @router.post("/register")
 def register_user(user: UserRegister):
-    existing_user = users.find_one({
-        "email": user.email
-    })
+    existing_user = users.find_one({"email": user.email})
 
     if existing_user:
         return {
@@ -19,12 +17,10 @@ def register_user(user: UserRegister):
             "message": "Email already registered"
         }
 
-    hashed_pw = hash_password(user.password)
-
     users.insert_one({
         "name": user.name,
         "email": user.email,
-        "password": hashed_pw
+        "password": hash_password(user.password)
     })
 
     return {
@@ -35,9 +31,7 @@ def register_user(user: UserRegister):
 
 @router.post("/login")
 def login_user(user: UserLogin):
-    existing_user = users.find_one({
-        "email": user.email
-    })
+    existing_user = users.find_one({"email": user.email})
 
     if not existing_user:
         return {
@@ -58,4 +52,34 @@ def login_user(user: UserLogin):
             "name": existing_user["name"],
             "email": existing_user["email"]
         }
+    }
+
+
+@router.post("/forgot-password")
+def forgot_password(data: dict):
+    email = data.get("email")
+    new_password = data.get("new_password")
+
+    if not email or not new_password:
+        return {
+            "success": False,
+            "message": "Email and new password are required"
+        }
+
+    existing_user = users.find_one({"email": email})
+
+    if not existing_user:
+        return {
+            "success": False,
+            "message": "User not found"
+        }
+
+    users.update_one(
+        {"email": email},
+        {"$set": {"password": hash_password(new_password)}}
+    )
+
+    return {
+        "success": True,
+        "message": "Password reset successfully. Please login again."
     }
