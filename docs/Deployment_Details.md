@@ -2,7 +2,7 @@
 
 ## Frontend
 
-Streamlit Cloud
+Vercel / Netlify / Render Static Site
 
 ## Backend
 

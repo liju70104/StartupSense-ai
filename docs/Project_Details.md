@@ -14,7 +14,7 @@ StartupSense-AI is an AI-powered startup validation platform that helps entrepre
 
 ## Technology Stack
 
-- Frontend: Streamlit
+- Frontend: React + Vite
 - Backend: FastAPI
 - Database: MongoDB Atlas
 - AI Engine: Gemini AI

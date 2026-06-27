@@ -2,7 +2,7 @@
 
 ## Framework
 
-Streamlit
+React + Vite
 
 ## Pages
 

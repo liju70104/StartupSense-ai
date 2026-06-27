@@ -19,7 +19,6 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://startupsense-ai-fdjgkoqjnbcswuwpwg6iwf.streamlit.app",
         "*"
     ],
     allow_credentials=True,
