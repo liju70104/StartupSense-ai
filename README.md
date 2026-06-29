@@ -1,339 +1,235 @@
 # 🚀 StartupSense-AI
 
-**StartupSense-AI** is a full-stack AI-powered startup idea validation platform built with **React, FastAPI, MongoDB Atlas, and Gemini AI**.
-It helps users analyze startup ideas, generate business scores, view dashboards, manage history, export reports, and track AI-powered startup insights.
+> **AI-Powered Startup Validation Platform** built with **React +
+> Vite**, **FastAPI**, **MongoDB Atlas**, and **Google Gemini AI**.
 
----
+![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?logo=react)
+![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?logo=mongodb)
+![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?logo=google)
+![License](https://img.shields.io/badge/License-Educational-blue)
 
-## 🌟 Project Highlights
+------------------------------------------------------------------------
 
-* 🔐 Login and Sign Up authentication
-* 🤖 AI-powered startup idea analysis
-* 📊 Modern React dashboard
-* 📈 Charts and analytics
-* 📜 Startup analysis history
-* 📄 Report generation and exports
-* 👤 User profile system
-* ⚙️ Advanced settings center
-* 🌗 Light and dark theme support
-* 🔔 Notification-ready system
-* 🧠 Gemini AI integration
-* ☁️ Backend deployed on Render
-* 🗄️ MongoDB Atlas database
+## 🌐 Live Demo
 
----
+-   **Frontend:** https://startupsense-ai.vercel.app
+-   **Backend:** https://startupsense-ai-backend.onrender.com
+-   **API Docs:** https://startupsense-ai-backend.onrender.com/docs
 
-## 🛠️ Tech Stack
+------------------------------------------------------------------------
 
-### Frontend
+# 📖 Project Overview
 
-* React
-* Vite
-* Tailwind CSS
-* Framer Motion
-* Recharts
-* Lucide React
-* TanStack Query
-* Sonner Toasts
+StartupSense-AI is a modern SaaS-style web application that helps
+entrepreneurs validate startup ideas using Artificial Intelligence.
+Users can securely log in, submit startup ideas, receive AI-powered
+business analysis, review previous analyses, and visualize insights
+through an interactive dashboard.
 
-### Backend
+------------------------------------------------------------------------
 
-* FastAPI
-* Python
-* Pydantic
-* Uvicorn
-* MongoDB Atlas
-* Gemini AI
+# 🎯 Objectives
 
-### Database
+-   Validate startup ideas with AI
+-   Provide SWOT and business analysis
+-   Evaluate market potential and revenue opportunities
+-   Store analysis history in MongoDB Atlas
+-   Deliver a modern, responsive user experience
+-   Deploy a production-ready full-stack application
 
-* MongoDB Atlas
+------------------------------------------------------------------------
 
-### Deployment
+# ✨ Features
 
-* Render Backend
-* React frontend deployment-ready
+-   Secure User Authentication
+-   AI Startup Analysis
+-   SWOT Analysis
+-   Market Potential Evaluation
+-   Revenue & Risk Analysis
+-   Dashboard Analytics
+-   Searchable History
+-   Reports
+-   User Profile
+-   Settings
+-   Dark / Light Theme
+-   MongoDB Atlas Storage
+-   Responsive UI
+-   Render + Vercel Deployment
 
----
+------------------------------------------------------------------------
 
-## 📂 Project Structure
+# 🏗️ System Architecture
 
-```text
-StartupSense-AI
-│
-├── backend
-│   ├── main.py
-│   ├── database.py
-│   ├── routes
-│   │   ├── auth.py
-│   │   ├── ideas.py
-│   │   └── user_system.py
-│   ├── models
-│   └── services
-│
-├── frontend
-│   ├── src
-│   │   ├── components
-│   │   ├── context
-│   │   ├── hooks
-│   │   ├── pages
-│   │   ├── providers
-│   │   └── App.jsx
-│   ├── package.json
-│   └── vite.config.js
-│
-├── docs
-├── diagrams
-├── screenshots
-├── requirements.txt
-└── README.md
+Frontend (React + Vite) │ ▼ REST API (FastAPI) │ ▼ Google Gemini AI │ ▼
+MongoDB Atlas
+
+------------------------------------------------------------------------
+
+# 🛠️ Technology Stack
+
+## Frontend
+
+-   React
+-   Vite
+-   Tailwind CSS
+-   Framer Motion
+-   TanStack Query
+-   Lucide Icons
+
+## Backend
+
+-   Python
+-   FastAPI
+-   Uvicorn
+
+## Database
+
+-   MongoDB Atlas
+
+## AI
+
+-   Google Gemini
+
+------------------------------------------------------------------------
+
+# 📂 Project Structure
+
+``` text
+backend/
+ ├── models/
+ ├── routes/
+ ├── services/
+ └── main.py
+
+frontend/
+ ├── public/
+ ├── src/
+ │   ├── components/
+ │   ├── context/
+ │   ├── hooks/
+ │   ├── pages/
+ │   └── providers/
+
+screenshots/
+README.md
+requirements.txt
 ```
 
----
+------------------------------------------------------------------------
 
-## 🚀 Features
+# 📸 Screenshots
 
-### Authentication
+Place screenshots in:
 
-* User registration
-* User login
-* Protected dashboard access
-* Logout support
-* Password change API
-* Email change API
-
-### Startup Analysis
-
-* Startup name
-* Industry
-* Problem statement
-* Solution
-* Target audience
-* Revenue model
-* Competitors
-* AI-generated business analysis
-* Startup score calculation
-* Risk level
-* Recommendation
-
-### Dashboard
-
-* Total startup ideas
-* Average score
-* Highest score
-* Success rate
-* Charts
-* Recent activity
-* System status
-* Quick actions
-
-### History
-
-* View saved startup analyses
-* Search records
-* Sort by latest or score
-* Export CSV
-
-### Reports
-
-* Select saved analysis
-* Generate report summary
-* Download report
-* Print report
-* Copy/share link
-
-### Profile
-
-* Profile photo upload
-* User information
-* Startup activity
-* AI activity
-* Achievements
-* Export user data
-* Download portfolio summary
-
-### Settings
-
-* Dark/light theme
-* Accent color picker
-* Font size
-* Animations toggle
-* Compact mode
-* Notification preferences
-* AI settings
-* Data export
-* Cache clearing
-* Backend monitor
-* Developer tools
-* About section
-
----
-
-## 🔌 API Endpoints
-
-```text
-POST /register
-POST /login
-POST /analyze
-GET  /dashboard
-GET  /history
-GET  /profile
-POST /profile
-GET  /settings
-POST /settings
-GET  /notifications
-POST /notifications
-POST /change-password
-POST /change-email
-GET  /system/status
-GET  /health
+``` text
+screenshots/app/
+screenshots/mongodb/
+screenshots/deployment/
+screenshots/github/
 ```
 
----
+Example:
 
-## ⚙️ Installation
-
-### Backend
-
-```bash
-cd backend
-pip install -r ../requirements.txt
-uvicorn main:app --reload
+``` md
+![Dashboard](screenshots/app/04-dashboard.png)
 ```
 
-### Frontend
+------------------------------------------------------------------------
 
-```bash
+# ⚙️ Installation
+
+## Clone Repository
+
+``` bash
+git clone https://github.com/liju70104/StartupSense-ai.git
+cd StartupSense-ai
+```
+
+## Backend
+
+``` bash
+pip install -r requirements.txt
+uvicorn backend.main:app --reload
+```
+
+## Frontend
+
+``` bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend runs at:
+------------------------------------------------------------------------
 
-```text
-http://localhost:5173
+# 🔐 Environment Variables
+
+``` env
+MONGODB_URI=your_connection_string
+GEMINI_API_KEY=your_api_key
+SECRET_KEY=your_secret_key
 ```
 
-Backend runs at:
+------------------------------------------------------------------------
 
-```text
-http://127.0.0.1:8000
-```
+# 🚀 Deployment
 
----
+## Frontend
 
-## 🌐 Deployment
+-   Vercel
 
-### Backend
+## Backend
 
-Backend is deployed using **Render**.
+-   Render
 
-### Frontend
+------------------------------------------------------------------------
 
-Frontend can be deployed using:
+# 🔌 API
 
-* Vercel
-* Netlify
-* Render Static Site
+  Method   Endpoint
+  -------- ------------
+  POST     /register
+  POST     /login
+  POST     /analyze
+  GET      /dashboard
+  GET      /history
 
----
+------------------------------------------------------------------------
 
-## 🖼️ Screenshots
+# 🍃 MongoDB Atlas
 
-Add screenshots inside the `screenshots` folder:
+Collections:
 
-```text
-screenshots/Login_UI.png
-screenshots/Dashboard_UI.png
-screenshots/Analyze_UI.png
-screenshots/History_UI.png
-screenshots/Reports_UI.png
-screenshots/Profile_UI.png
-screenshots/Settings_UI.png
-```
+-   users
+-   startup_ideas
+-   history
 
-Then use:
+------------------------------------------------------------------------
 
-```md
-![Login UI](screenshots/Login_UI.png)
-![Dashboard UI](screenshots/Dashboard_UI.png)
-![Analyze UI](screenshots/Analyze_UI.png)
-![Profile UI](screenshots/Profile_UI.png)
-![Settings UI](screenshots/Settings_UI.png)
-```
+# 📈 Future Improvements
 
----
+-   Email verification
+-   Password reset by email
+-   Team collaboration
+-   Investor dashboard
+-   PDF exports
+-   Notifications
 
-## 🧠 AI Integration
+------------------------------------------------------------------------
 
-StartupSense-AI uses Gemini AI to generate business insights, recommendations, and startup validation feedback.
+# 👨‍💻 Author
 
-The AI system helps evaluate:
+**Liju S**
 
-* Innovation
-* Market potential
-* Revenue model
-* Competition level
-* Risk
-* Startup readiness
+Second-Year Artificial Intelligence & Data Science Student
 
----
+------------------------------------------------------------------------
 
-## 📊 Database Collections
+# 📄 License
 
-```text
-users
-startup_ideas
-analysis_results
-reports
-user_profiles
-user_settings
-notifications
-login_history
-system_logs
-```
+This project is intended for educational, learning, and portfolio
+purposes.
 
----
-
-## 🔮 Future Enhancements
-
-* JWT authentication
-* Role-based access
-* Advanced PDF reports
-* Floating AI assistant
-* Real-time notifications
-* User-specific history filtering
-* Admin dashboard
-* Multi-theme engine
-* Investor readiness scoring
-
----
-
-## 👨‍💻 Developer
-
-**Liju**
-Artificial Intelligence and Data Science Student
-VSB Engineering College
-
----
-
-## ⭐ Project Status
-
-```text
-Backend        ✅ Completed
-Frontend       ✅ React version active
-Database       ✅ MongoDB Atlas connected
-AI             ✅ Gemini AI integrated
-Authentication ✅ Login/Register active
-Dashboard      ✅ Working
-Reports        ✅ Working
-Profile        ✅ Working
-Settings       ✅ Working
-```
-
----
-
-## 📌 Project Summary
-
-StartupSense-AI is a modern AI SaaS-style platform designed to help users validate startup ideas using artificial intelligence, analytics, reports, and business insights.
+⭐ If you found this project useful, consider giving it a star on
+GitHub.
