@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useAuth } from "../context/AuthContext.jsx";
 import {
   Brain,
   CheckCircle2,
   Loader2,
   Rocket,
   Sparkles,
-  Target,
-  Users,
   Wallet,
 } from "lucide-react";
 import {
@@ -32,6 +33,9 @@ const initialForm = {
 };
 
 export default function Analyze() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
@@ -39,21 +43,9 @@ export default function Analyze() {
   const [error, setError] = useState("");
 
   const steps = [
-    {
-      title: "Startup Identity",
-      icon: Rocket,
-      fields: ["startup_name", "industry"],
-    },
-    {
-      title: "Problem & Solution",
-      icon: Brain,
-      fields: ["problem", "solution"],
-    },
-    {
-      title: "Market & Money",
-      icon: Wallet,
-      fields: ["target_audience", "revenue_model", "competitors"],
-    },
+    { title: "Startup Identity", icon: Rocket, fields: ["startup_name", "industry"] },
+    { title: "Problem & Solution", icon: Brain, fields: ["problem", "solution"] },
+    { title: "Market & Money", icon: Wallet, fields: ["target_audience", "revenue_model", "competitors"] },
   ];
 
   const current = steps[step];
@@ -65,6 +57,11 @@ export default function Analyze() {
   const isStepValid = current.fields.every((field) => form[field]?.trim());
 
   const submitAnalysis = async () => {
+    if (!user?.email) {
+      toast.error("Please login again");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setAnalysis(null);
@@ -72,24 +69,45 @@ export default function Analyze() {
     try {
       const res = await fetch(`${API_URL}/analyze`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, user_email: user.email }),
       });
 
       const data = await res.json();
 
       if (data.success) {
         setAnalysis(data.analysis);
+        toast.success("Startup analyzed successfully");
+
+        queryClient.invalidateQueries({ queryKey: ["dashboard", user.email] });
+        queryClient.invalidateQueries({ queryKey: ["history", user.email] });
       } else {
         setError(data.message || "Analysis failed.");
+        toast.error(data.message || "Analysis failed");
       }
-    } catch (err) {
+    } catch {
       setError("Backend not connected or analysis failed.");
+      toast.error("Backend not connected");
     } finally {
       setLoading(false);
     }
+  };
+
+  const downloadReport = () => {
+    if (!analysis) return;
+
+    const file = new Blob([JSON.stringify(analysis, null, 2)], {
+      type: "text/plain",
+    });
+
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${form.startup_name || "startup"}_analysis_report.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    toast.success("Report downloaded");
   };
 
   const scoreData = analysis
@@ -107,11 +125,11 @@ export default function Analyze() {
         className="rounded-[36px] border p-10"
         style={{
           borderColor: "var(--border)",
-          background:
-            "linear-gradient(135deg, var(--card-strong), var(--card))",
+          background: "linear-gradient(135deg, var(--card-strong), var(--card))",
         }}
       >
-        <p className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-extrabold text-secondary"
+        <p
+          className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-extrabold text-secondary"
           style={{ borderColor: "var(--border)", background: "var(--card)" }}
         >
           <Sparkles className="h-4 w-4 text-[color:var(--accent-blue)]" />
@@ -125,6 +143,10 @@ export default function Analyze() {
         <p className="mt-5 max-w-3xl text-lg leading-8 text-secondary">
           Use a guided startup validation flow to generate AI scores, risk level,
           recommendations, and report-ready business insights.
+        </p>
+
+        <p className="mt-4 text-sm text-secondary">
+          Logged in as: <span className="font-bold text-primary">{user?.email}</span>
         </p>
       </section>
 
@@ -142,9 +164,7 @@ export default function Analyze() {
                   onClick={() => setStep(index)}
                   className="flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition hover:-translate-y-1"
                   style={{
-                    borderColor: active
-                      ? "var(--accent-blue)"
-                      : "var(--border)",
+                    borderColor: active ? "var(--accent-blue)" : "var(--border)",
                     background: active ? "var(--card-strong)" : "var(--card)",
                   }}
                 >
@@ -178,9 +198,9 @@ export default function Analyze() {
             <h2 className="font-display text-3xl font-extrabold text-primary">
               {current.title}
             </h2>
+
             <p className="mt-2 text-secondary">
-              Fill the details carefully. Stronger inputs produce better AI
-              validation results.
+              Fill the details carefully. Stronger inputs produce better AI validation results.
             </p>
 
             <div className="mt-6 space-y-5">
@@ -328,11 +348,7 @@ export default function Analyze() {
                     <XAxis dataKey="name" stroke="var(--text-secondary)" />
                     <YAxis stroke="var(--text-secondary)" />
                     <Tooltip />
-                    <Bar
-                      dataKey="value"
-                      fill="#38bdf8"
-                      radius={[12, 12, 0, 0]}
-                    />
+                    <Bar dataKey="value" fill="#38bdf8" radius={[12, 12, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -356,16 +372,7 @@ export default function Analyze() {
               </p>
 
               <button
-                onClick={() => {
-                  const file = new Blob([JSON.stringify(analysis, null, 2)], {
-                    type: "text/plain",
-                  });
-                  const url = URL.createObjectURL(file);
-                  const link = document.createElement("a");
-                  link.href = url;
-                  link.download = "startup_analysis_report.txt";
-                  link.click();
-                }}
+                onClick={downloadReport}
                 className="mt-6 rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-3 font-extrabold text-white"
               >
                 Download Report

@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useAuth } from "../../context/AuthContext.jsx";
 import Register from "./Register.jsx";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://startupsense-ai-backend.onrender.com";
 
 export default function Login() {
   const { login, authLoading } = useAuth();

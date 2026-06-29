@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useDashboard } from "../hooks/useDashboard.js";
 import { useHistory } from "../hooks/useHistory.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const API_URL = "https://startupsense-ai-backend.onrender.com";
 
@@ -32,9 +33,12 @@ const defaultSettings = {
 
 export default function Settings() {
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
+  const email = user?.email || "";
+
   const queryClient = useQueryClient();
-  const { data: dashboard } = useDashboard();
-  const { data: historyData } = useHistory();
+  const { data: dashboard } = useDashboard(email);
+  const { data: historyData } = useHistory(email);
 
   const history = historyData?.history || [];
 
@@ -44,22 +48,29 @@ export default function Settings() {
 
   const [apiTime, setApiTime] = useState("Not checked");
   const [lastSync, setLastSync] = useState(new Date().toLocaleString());
-
   const [passwordPanel, setPasswordPanel] = useState(false);
   const [emailPanel, setEmailPanel] = useState(false);
 
   const [security, setSecurity] = useState({
-    email: "YOUR_LOGIN_EMAIL_HERE",
+    email: email,
     current_password: "",
     new_password: "",
     confirm_password: "",
-    old_email: "YOUR_LOGIN_EMAIL_HERE",
+    old_email: email,
     new_email: "",
   });
 
   useEffect(() => {
     localStorage.setItem("startup_settings", JSON.stringify(settings));
   }, [settings]);
+
+  useEffect(() => {
+    setSecurity((prev) => ({
+      ...prev,
+      email,
+      old_email: email,
+    }));
+  }, [email]);
 
   const update = (key, value) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -126,15 +137,9 @@ export default function Settings() {
       const data = await res.json();
 
       if (data.success) {
-        toast.success(data.message);
-        setEmailPanel(false);
-        setSecurity({
-          ...security,
-          email: security.new_email,
-          old_email: security.new_email,
-          new_email: "",
-        });
-        queryClient.invalidateQueries();
+        toast.success(`${data.message}. Please login again with new email.`);
+        localStorage.removeItem("startup_user");
+        setTimeout(() => window.location.reload(), 1200);
       } else {
         toast.error(data.message);
       }
@@ -144,11 +149,18 @@ export default function Settings() {
   };
 
   const testBackend = async () => {
+    if (!email) {
+      toast.error("Login required");
+      return;
+    }
+
     const start = performance.now();
+
     try {
-      const res = await fetch(`${API_URL}/dashboard`);
+      const res = await fetch(`${API_URL}/dashboard?email=${email}`);
       await res.json();
       const end = performance.now();
+
       setApiTime(`${Math.round(end - start)} ms`);
       setLastSync(new Date().toLocaleString());
       toast.success("Backend speed tested");
@@ -160,7 +172,7 @@ export default function Settings() {
 
   const exportJSON = () => {
     const file = new Blob(
-      [JSON.stringify({ settings, dashboard, history }, null, 2)],
+      [JSON.stringify({ user, settings, dashboard, history }, null, 2)],
       { type: "application/json" }
     );
     downloadFile(file, "startupsense_export.json");
@@ -177,6 +189,7 @@ export default function Settings() {
       item.status || "N/A",
       item.created_at || "N/A",
     ]);
+
     const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
     downloadFile(new Blob([csv], { type: "text/csv" }), "startupsense_history.csv");
     toast.success("CSV exported");
@@ -186,6 +199,8 @@ export default function Settings() {
     const text = `
 STARTUPSENSE-AI REPORT EXPORT
 
+User: ${user?.name || "User"}
+Email: ${email}
 Total Ideas: ${dashboard?.total_ideas || 0}
 Average Score: ${dashboard?.average_score || 0}
 Highest Score: ${dashboard?.highest_score || 0}
@@ -193,6 +208,7 @@ Reports: ${history.length}
 
 Generated At: ${new Date().toLocaleString()}
 `;
+
     downloadFile(new Blob([text], { type: "text/plain" }), "startupsense_report_export.txt");
     toast.success("Report exported");
   };
@@ -202,9 +218,11 @@ Generated At: ${new Date().toLocaleString()}
     if (!file) return;
 
     const reader = new FileReader();
+
     reader.onload = () => {
       try {
         const imported = JSON.parse(reader.result);
+
         if (imported.settings) {
           setSettings({ ...defaultSettings, ...imported.settings });
           toast.success("Backup imported successfully");
@@ -215,6 +233,7 @@ Generated At: ${new Date().toLocaleString()}
         toast.error("Invalid backup file");
       }
     };
+
     reader.readAsText(file);
   };
 
@@ -236,8 +255,10 @@ Generated At: ${new Date().toLocaleString()}
           Settings Center
         </h1>
         <p className="mt-4 text-secondary">
-          Appearance, notifications, AI behavior, data exports, security, backend monitor,
-          developer tools, and application information.
+          Manage account security, appearance, notifications, AI behavior, storage, and system status.
+        </p>
+        <p className="mt-3 text-sm text-secondary">
+          Logged in as: <span className="font-bold text-primary">{email}</span>
         </p>
       </section>
 
@@ -276,11 +297,16 @@ Generated At: ${new Date().toLocaleString()}
           <ActionButton icon={FileJson} label="Export JSON" onClick={exportJSON} />
           <ActionButton icon={FileText} label="Export CSV" onClick={exportCSV} />
           <ActionButton icon={Download} label="Export PDF/Text" onClick={exportPDFText} />
-          <label className="cursor-pointer rounded-2xl border p-4 font-bold text-primary" style={{ borderColor: "var(--border)", background: "var(--card)" }}>
+
+          <label
+            className="cursor-pointer rounded-2xl border p-4 font-bold text-primary"
+            style={{ borderColor: "var(--border)", background: "var(--card)" }}
+          >
             <Upload className="mb-2 h-5 w-5 text-[color:var(--accent-blue)]" />
             Import backup
             <input type="file" accept=".json" onChange={importBackup} className="hidden" />
           </label>
+
           <ActionButton icon={Trash2} label="Clear cache" onClick={clearCache} />
           <ActionButton icon={RefreshCcw} label="Refresh backend cache" onClick={refreshBackend} />
         </div>
@@ -290,8 +316,8 @@ Generated At: ${new Date().toLocaleString()}
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <ActionButton icon={Lock} label="Change Password" onClick={() => setPasswordPanel(!passwordPanel)} />
           <ActionButton icon={Mail} label="Change Email" onClick={() => setEmailPanel(!emailPanel)} />
-          <Info label="Active Session" value="Current browser session" />
-          <Info label="Login History" value="Latest login tracked locally" />
+          <Info label="Active Session" value="Current authenticated browser session" />
+          <Info label="Login Email" value={email || "Not available"} />
           <Toggle label="Two-factor authentication" value={settings.twoFactor} onChange={(v) => update("twoFactor", v)} />
         </div>
       </Section>
@@ -299,12 +325,10 @@ Generated At: ${new Date().toLocaleString()}
       {passwordPanel && (
         <div className="glass-card p-6">
           <h3 className="font-display text-2xl font-extrabold text-primary">Change Password</h3>
-
           <SecurityInput placeholder="Email" value={security.email} onChange={(v) => setSecurity({ ...security, email: v })} />
           <SecurityInput placeholder="Current password" type="password" value={security.current_password} onChange={(v) => setSecurity({ ...security, current_password: v })} />
           <SecurityInput placeholder="New password" type="password" value={security.new_password} onChange={(v) => setSecurity({ ...security, new_password: v })} />
           <SecurityInput placeholder="Confirm new password" type="password" value={security.confirm_password} onChange={(v) => setSecurity({ ...security, confirm_password: v })} />
-
           <button onClick={changePassword} className="mt-4 rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-3 font-bold text-white">
             Update Password
           </button>
@@ -314,10 +338,8 @@ Generated At: ${new Date().toLocaleString()}
       {emailPanel && (
         <div className="glass-card p-6">
           <h3 className="font-display text-2xl font-extrabold text-primary">Change Email</h3>
-
           <SecurityInput placeholder="Current email" value={security.old_email} onChange={(v) => setSecurity({ ...security, old_email: v })} />
           <SecurityInput placeholder="New email" value={security.new_email} onChange={(v) => setSecurity({ ...security, new_email: v })} />
-
           <button onClick={changeEmail} className="mt-4 rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-3 font-bold text-white">
             Update Email
           </button>
@@ -452,4 +474,5 @@ function downloadFile(file, filename) {
   link.href = url;
   link.download = filename;
   link.click();
+  URL.revokeObjectURL(url);
 }

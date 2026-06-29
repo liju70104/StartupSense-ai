@@ -9,26 +9,32 @@ from backend.services.gemini_service import analyze_startup_idea_ai
 router = APIRouter()
 
 
+def now():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 @router.post("/analyze")
 def analyze_idea(idea: StartupIdea):
     idea_data = idea.dict()
-    idea_data["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    user_email = idea_data.get("user_email") or "demo@startupsense.ai"
+
+    idea_data["user_email"] = user_email
+    idea_data["created_at"] = now()
 
     inserted_idea = startup_ideas.insert_one(idea_data)
 
     result = analyze_startup_idea(idea)
-
     ai_analysis = analyze_startup_idea_ai(idea_data)
 
     result["idea_id"] = str(inserted_idea.inserted_id)
-    result["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    result["created_at"] = now()
     result["startup_name"] = idea_data.get("startup_name", "")
     result["industry"] = idea_data.get("industry", "")
+    result["user_email"] = user_email
     result["ai_analysis"] = ai_analysis
 
     analysis_results.insert_one(result.copy())
-
-    result["_id"] = str(result.get("_id", "")) if "_id" in result else ""
 
     return {
         "success": True,
@@ -38,9 +44,9 @@ def analyze_idea(idea: StartupIdea):
 
 
 @router.get("/history")
-def get_history():
+def get_history(email: str):
     results = list(
-        analysis_results.find().sort("created_at", -1)
+        analysis_results.find({"user_email": email}).sort("created_at", -1)
     )
 
     for item in results:
@@ -53,8 +59,10 @@ def get_history():
 
 
 @router.get("/dashboard")
-def dashboard_stats():
-    results = list(analysis_results.find())
+def dashboard_stats(email: str):
+    results = list(
+        analysis_results.find({"user_email": email})
+    )
 
     total_ideas = len(results)
 

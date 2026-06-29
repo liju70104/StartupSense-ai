@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   Clock,
   Download,
@@ -9,34 +10,23 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const API_URL = "https://startupsense-ai-backend.onrender.com";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useHistory } from "../hooks/useHistory.js";
 
 export default function History() {
-  const [history, setHistory] = useState([]);
+  const { user } = useAuth();
+  const email = user?.email || "";
+
+  const {
+    data,
+    isLoading,
+    refetch,
+  } = useHistory(email);
+
+  const history = data?.history || [];
+
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("latest");
-  const [loading, setLoading] = useState(true);
-
-  const loadHistory = async () => {
-    setLoading(true);
-
-    try {
-      const res = await fetch(`${API_URL}/history`);
-      const data = await res.json();
-
-      if (data.success) {
-        setHistory(data.history || []);
-      }
-    } catch (error) {
-      console.log("History load failed", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadHistory();
-  }, []);
 
   const filteredHistory = useMemo(() => {
     let items = [...history];
@@ -64,7 +54,17 @@ export default function History() {
     return items;
   }, [history, query, sortBy]);
 
+  const refreshHistory = async () => {
+    await refetch();
+    toast.success("History refreshed");
+  };
+
   const exportCSV = () => {
+    if (filteredHistory.length === 0) {
+      toast.error("No history available to export");
+      return;
+    }
+
     const headers = [
       "Startup Name",
       "Industry",
@@ -72,6 +72,7 @@ export default function History() {
       "Risk Level",
       "Status",
       "Created At",
+      "User Email",
     ];
 
     const rows = filteredHistory.map((item) => [
@@ -81,6 +82,7 @@ export default function History() {
       item.risk_level || "N/A",
       item.status || "N/A",
       item.created_at || "N/A",
+      item.user_email || email,
     ]);
 
     const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
@@ -91,6 +93,9 @@ export default function History() {
     link.href = url;
     link.download = "startup_history.csv";
     link.click();
+    URL.revokeObjectURL(url);
+
+    toast.success("History CSV exported");
   };
 
   return (
@@ -100,11 +105,12 @@ export default function History() {
         animate={{ opacity: 1, y: 0 }}
         className="glass-card p-10"
       >
-        <p className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-extrabold text-secondary"
+        <p
+          className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-extrabold text-secondary"
           style={{ borderColor: "var(--border)", background: "var(--card)" }}
         >
           <Clock className="h-4 w-4 text-[color:var(--accent-blue)]" />
-          MongoDB analysis records
+          User-specific MongoDB records
         </p>
 
         <h1 className="gradient-title font-display text-6xl font-extrabold tracking-tight">
@@ -112,13 +118,18 @@ export default function History() {
         </h1>
 
         <p className="mt-5 max-w-3xl text-lg leading-8 text-secondary">
-          Search, sort, review, and export all startup ideas analyzed through
-          StartupSense-AI.
+          Search, sort, review, and export startup ideas analyzed by your logged-in account.
+        </p>
+
+        <p className="mt-3 text-sm text-secondary">
+          Showing records for:{" "}
+          <span className="font-bold text-primary">{email || "Not logged in"}</span>
         </p>
       </motion.section>
 
       <div className="glass-card grid gap-4 p-5 md:grid-cols-3">
-        <div className="flex items-center gap-3 rounded-2xl border px-4 py-3 md:col-span-2"
+        <div
+          className="flex items-center gap-3 rounded-2xl border px-4 py-3 md:col-span-2"
           style={{ borderColor: "var(--border)", background: "var(--card)" }}
         >
           <Search className="h-5 w-5 text-[color:var(--accent-blue)]" />
@@ -141,7 +152,7 @@ export default function History() {
         </select>
 
         <button
-          onClick={loadHistory}
+          onClick={refreshHistory}
           className="rounded-2xl border px-5 py-3 font-extrabold text-primary"
           style={{ borderColor: "var(--border)", background: "var(--card)" }}
         >
@@ -158,7 +169,7 @@ export default function History() {
         </button>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="grid gap-5 md:grid-cols-2">
           <div className="glass-card h-44 animate-pulse" />
           <div className="glass-card h-44 animate-pulse" />
@@ -169,7 +180,7 @@ export default function History() {
             No history found
           </h3>
           <p className="mt-3 text-secondary">
-            Analyze a startup idea first or try clearing the search.
+            Analyze a startup idea first, or try clearing your search filter.
           </p>
         </div>
       ) : (
@@ -201,10 +212,11 @@ export default function History() {
                 <Mini label="Risk" value={item.risk_level || "N/A"} />
                 <Mini label="Status" value={item.status || "N/A"} />
                 <Mini label="Created" value={item.created_at || "N/A"} />
-                <Mini label="Source" value="MongoDB" />
+                <Mini label="User" value={item.user_email || email} />
               </div>
 
-              <div className="mt-5 rounded-2xl border p-4"
+              <div
+                className="mt-5 rounded-2xl border p-4"
                 style={{ borderColor: "var(--border)", background: "var(--card)" }}
               >
                 <p className="flex items-center gap-2 font-bold text-primary">
@@ -225,11 +237,10 @@ export default function History() {
       <div className="glass-card p-6">
         <p className="flex items-center gap-2 font-bold text-primary">
           <TrendingUp className="h-5 w-5 text-[color:var(--accent-blue)]" />
-          History module is live
+          History module is user-specific
         </p>
         <p className="mt-2 text-secondary">
-          This page is connected to your real `/history` API and displays records
-          from MongoDB Atlas.
+          This page now calls your real `/history?email={email || "user"}` API and displays only your account records.
         </p>
       </div>
     </div>
