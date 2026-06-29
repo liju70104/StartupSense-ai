@@ -2,19 +2,30 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const API_URL = "https://startupsense-ai-backend.onrender.com";
-const AuthContext = createContext();
+const AuthContext = createContext(null);
+
+function getSavedUser() {
+  try {
+    const savedUser = localStorage.getItem("startup_user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  } catch {
+    localStorage.removeItem("startup_user");
+    return null;
+  }
+}
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    return JSON.parse(localStorage.getItem("startup_user")) || null;
-  });
-
+  const [user, setUser] = useState(getSavedUser);
   const [authLoading, setAuthLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("startup_user", JSON.stringify(user));
-    } else {
+    try {
+      if (user) {
+        localStorage.setItem("startup_user", JSON.stringify(user));
+      } else {
+        localStorage.removeItem("startup_user");
+      }
+    } catch {
       localStorage.removeItem("startup_user");
     }
   }, [user]);
@@ -97,5 +108,11 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+
+  return context;
 }
