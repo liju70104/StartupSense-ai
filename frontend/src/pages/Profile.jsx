@@ -3,8 +3,8 @@ import { toast } from "sonner";
 import {
   User,
   Mail,
-  GraduationCap,
-  Globe2,
+  MapPinned,
+  Map,
   Clock,
   Calendar,
   BarChart3,
@@ -17,7 +17,6 @@ import {
   LogOut,
   Camera,
   Lock,
-  BadgeCheck,
   Save,
   X,
 } from "lucide-react";
@@ -30,7 +29,7 @@ const API_URL = "https://startupsense-ai-backend.onrender.com";
 
 export default function Profile() {
   const { user, logout } = useAuth();
-  const email = user?.email;
+  const email = user?.email || "";
 
   const { data: dashboard } = useDashboard(email);
   const { data: historyData } = useHistory(email);
@@ -38,14 +37,12 @@ export default function Profile() {
   const history = historyData?.history || [];
 
   const [profile, setProfile] = useState({
-    name: user?.name || "User",
+    name: user?.name || "",
     email: user?.email || "",
-    role: "Founder",
-    college: "VSB Engineering College",
-    department: "Artificial Intelligence and Data Science",
-    country_timezone: "India / Asia-Kolkata",
-    created_at: "N/A",
-    last_login: new Date().toLocaleString(),
+    state: user?.state || "",
+    district: user?.district || "",
+    created_at: user?.created_at || "",
+    last_login: user?.last_login || "",
     profile_photo: "",
   });
 
@@ -66,16 +63,22 @@ export default function Profile() {
       .then((data) => {
         if (data.success) {
           setProfile({
-            ...data.profile,
-            name: data.profile.name || user?.name || "User",
-            email: data.profile.email || email,
+            name: data.profile.name || "",
+            email: data.profile.email || "",
+            state: data.profile.state || "",
+            district: data.profile.district || "",
+            created_at: data.profile.created_at || "",
+            last_login: data.profile.last_login || "",
+            profile_photo: data.profile.profile_photo || "",
           });
+        } else {
+          toast.error(data.message || "Profile could not be loaded");
         }
       })
       .catch(() => {
         toast.error("Profile could not be loaded");
       });
-  }, [email, user?.name]);
+  }, [email]);
 
   const favoriteIndustry = useMemo(() => {
     const counts = {};
@@ -111,6 +114,11 @@ export default function Profile() {
   };
 
   const saveProfile = async () => {
+    if (!profile.name || !profile.email || !profile.state || !profile.district) {
+      toast.error("Name, email, state and district are required");
+      return;
+    }
+
     try {
       const res = await fetch(`${API_URL}/profile`, {
         method: "POST",
@@ -134,11 +142,7 @@ export default function Profile() {
   };
 
   const changePassword = async () => {
-    if (
-      !passwordForm.current_password ||
-      !passwordForm.new_password ||
-      !passwordForm.confirm_password
-    ) {
+    if (!passwordForm.current_password || !passwordForm.new_password || !passwordForm.confirm_password) {
       toast.error("Fill all password fields");
       return;
     }
@@ -189,16 +193,16 @@ export default function Profile() {
     toast.success("Profile data exported");
   };
 
-  const downloadPortfolio = () => {
+  const downloadProfileSummary = () => {
     const text = `
-STARTUPSENSE-AI PORTFOLIO PROFILE
+STARTUPSENSE-AI USER PROFILE
 
 Name: ${profile.name}
 Email: ${profile.email}
-Role: ${profile.role}
-College: ${profile.college}
-Department: ${profile.department}
-Country/Timezone: ${profile.country_timezone}
+State: ${profile.state}
+District: ${profile.district}
+Account Created: ${profile.created_at || "N/A"}
+Last Login: ${profile.last_login || "N/A"}
 
 Startup Activity:
 Total Ideas: ${totalIdeas}
@@ -209,25 +213,24 @@ Success Rate: ${successRate}%
 Favorite Industry: ${favoriteIndustry}
 
 AI Activity:
-Gemini Requests Used: ${history.length}
 AI Reports Generated: ${history.length}
 Last AI Analysis Date: ${latest?.created_at || "N/A"}
 Most Recent Startup: ${latest?.startup_name || "N/A"}
 `;
 
     const file = new Blob([text], { type: "text/plain" });
-    downloadFile(file, "StartupSense_AI_Portfolio.txt");
-    toast.success("Portfolio downloaded");
+    downloadFile(file, "StartupSense_AI_User_Profile.txt");
+    toast.success("Profile summary downloaded");
   };
 
   return (
     <div className="space-y-6">
       <section className="glass-card p-10">
         <h1 className="gradient-title font-display text-6xl font-extrabold">
-          Founder Profile
+          User Profile
         </h1>
         <p className="mt-4 text-secondary">
-          Account information, startup analytics, AI activity, achievements, and quick actions.
+          Manage your account details, startup activity, AI analysis history, and quick actions.
         </p>
       </section>
 
@@ -253,18 +256,19 @@ Most Recent Startup: ${latest?.startup_name || "N/A"}
           </div>
 
           <h2 className="mt-5 text-center font-display text-3xl font-extrabold text-primary">
-            {profile.name}
+            {profile.name || "User"}
           </h2>
 
-          <p className="text-center text-secondary">{profile.role} Mode</p>
+          <p className="text-center text-secondary">
+            Personal Account
+          </p>
 
           <div className="mt-6 space-y-3">
-            <Info icon={Mail} label="Email" value={profile.email} />
-            <Info icon={GraduationCap} label="College" value={profile.college} />
-            <Info icon={BadgeCheck} label="Department" value={profile.department} />
-            <Info icon={Globe2} label="Country / Timezone" value={profile.country_timezone} />
-            <Info icon={Calendar} label="Account Created" value={profile.created_at} />
-            <Info icon={Clock} label="Last Login" value={profile.last_login} />
+            <Info icon={Mail} label="Email" value={profile.email || "N/A"} />
+            <Info icon={MapPinned} label="State" value={profile.state || "N/A"} />
+            <Info icon={Map} label="District" value={profile.district || "N/A"} />
+            <Info icon={Calendar} label="Account Created" value={profile.created_at || "N/A"} />
+            <Info icon={Clock} label="Last Login" value={profile.last_login || "N/A"} />
           </div>
         </div>
 
@@ -284,10 +288,8 @@ Most Recent Startup: ${latest?.startup_name || "N/A"}
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <EditInput label="Name" value={profile.name} onChange={(v) => setProfile({ ...profile, name: v })} />
                 <EditInput label="Email" value={profile.email} onChange={(v) => setProfile({ ...profile, email: v })} />
-                <EditInput label="Role" value={profile.role} onChange={(v) => setProfile({ ...profile, role: v })} />
-                <EditInput label="College" value={profile.college} onChange={(v) => setProfile({ ...profile, college: v })} />
-                <EditInput label="Department" value={profile.department} onChange={(v) => setProfile({ ...profile, department: v })} />
-                <EditInput label="Country / Timezone" value={profile.country_timezone} onChange={(v) => setProfile({ ...profile, country_timezone: v })} />
+                <EditInput label="State" value={profile.state} onChange={(v) => setProfile({ ...profile, state: v })} />
+                <EditInput label="District" value={profile.district} onChange={(v) => setProfile({ ...profile, district: v })} />
               </div>
 
               <button
@@ -311,7 +313,6 @@ Most Recent Startup: ${latest?.startup_name || "N/A"}
 
           <div className="grid gap-5 md:grid-cols-2">
             <Panel title="AI Activity">
-              <Mini label="Gemini requests used" value={history.length} />
               <Mini label="AI reports generated" value={history.length} />
               <Mini label="Last AI analysis date" value={latest?.created_at || "N/A"} />
               <Mini label="Most recent startup" value={latest?.startup_name || "N/A"} />
@@ -321,7 +322,7 @@ Most Recent Startup: ${latest?.startup_name || "N/A"}
             <Panel title="Achievements">
               <Achievement active={history.length >= 1} text="🥇 First Startup Submitted" />
               <Achievement active={history.length >= 10} text="🚀 10 Ideas Analyzed" />
-              <Achievement active={true} text="📊 100% Profile Completed" />
+              <Achievement active={Boolean(profile.name && profile.email && profile.state && profile.district)} text="📊 Profile Completed" />
               <Achievement active={history.length >= 1} text="🤖 AI Explorer" />
               <Achievement active={highScore >= 90} text="⭐ High Score (90+)" />
             </Panel>
@@ -336,7 +337,7 @@ Most Recent Startup: ${latest?.startup_name || "N/A"}
               <Action icon={Edit3} label="Edit Profile" onClick={() => setEditing(true)} />
               <Action icon={Lock} label="Change Password" onClick={() => setPasswordOpen(!passwordOpen)} />
               <Action icon={Download} label="Export My Data" onClick={exportMyData} />
-              <Action icon={FileText} label="Download Portfolio" onClick={downloadPortfolio} />
+              <Action icon={FileText} label="Download Profile" onClick={downloadProfileSummary} />
               <Action icon={LogOut} label="Logout" onClick={logout} />
             </div>
 

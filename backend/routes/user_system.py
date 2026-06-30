@@ -8,7 +8,7 @@ from backend.database import (
     notifications,
     login_history,
     system_logs,
-    analysis_results
+    analysis_results,
 )
 
 from backend.config import hash_password, verify_password
@@ -21,21 +21,29 @@ def now():
 
 
 @router.get("/profile")
-def get_profile(email: str = "demo@startupsense.ai"):
+def get_profile(email: str):
+    user = users.find_one({"email": email})
+
+    if not user:
+        return {
+            "success": False,
+            "message": "User not found",
+        }
+
     profile = user_profiles.find_one({"email": email})
 
     if not profile:
         profile = {
-            "name": "Liju",
-            "email": email,
-            "role": "Founder",
-            "college": "VSB Engineering College",
-            "department": "Artificial Intelligence and Data Science",
-            "country_timezone": "India / Asia-Kolkata",
-            "created_at": now(),
-            "last_login": now(),
-            "profile_photo": ""
+            "name": user.get("name", ""),
+            "email": user.get("email", ""),
+            "state": user.get("state", ""),
+            "district": user.get("district", ""),
+            "created_at": user.get("created_at", ""),
+            "last_login": user.get("last_login", ""),
+            "profile_photo": "",
+            "updated_at": now(),
         }
+
         user_profiles.insert_one(profile)
         profile = user_profiles.find_one({"email": email})
 
@@ -43,29 +51,62 @@ def get_profile(email: str = "demo@startupsense.ai"):
 
     return {
         "success": True,
-        "profile": profile
+        "profile": {
+            "name": profile.get("name", ""),
+            "email": profile.get("email", ""),
+            "state": profile.get("state", ""),
+            "district": profile.get("district", ""),
+            "created_at": profile.get("created_at", user.get("created_at", "")),
+            "last_login": user.get("last_login", profile.get("last_login", "")),
+            "profile_photo": profile.get("profile_photo", ""),
+        },
     }
 
 
 @router.post("/profile")
 def update_profile(data: dict):
-    email = data.get("email", "demo@startupsense.ai")
-    data["updated_at"] = now()
+    email = data.get("email")
+
+    if not email:
+        return {
+            "success": False,
+            "message": "Email is required",
+        }
+
+    allowed_data = {
+        "name": data.get("name", ""),
+        "email": email,
+        "state": data.get("state", ""),
+        "district": data.get("district", ""),
+        "profile_photo": data.get("profile_photo", ""),
+        "updated_at": now(),
+    }
 
     user_profiles.update_one(
         {"email": email},
-        {"$set": data},
-        upsert=True
+        {"$set": allowed_data},
+        upsert=True,
+    )
+
+    users.update_one(
+        {"email": email},
+        {
+            "$set": {
+                "name": allowed_data["name"],
+                "state": allowed_data["state"],
+                "district": allowed_data["district"],
+            }
+        },
     )
 
     return {
         "success": True,
-        "message": "Profile updated successfully"
+        "message": "Profile updated successfully",
     }
 
 
 @router.get("/settings")
-def get_settings(email: str = "demo@startupsense.ai"):
+def get_settings(email: str):
     settings = user_settings.find_one({"email": email})
 
     if not settings:
@@ -88,8 +129,9 @@ def get_settings(email: str = "demo@startupsense.ai"):
             "auto_save": True,
             "two_factor": False,
             "created_at": now(),
-            "updated_at": now()
+            "updated_at": now(),
         }
+
         user_settings.insert_one(settings)
         settings = user_settings.find_one({"email": email})
 
@@ -97,68 +139,44 @@ def get_settings(email: str = "demo@startupsense.ai"):
 
     return {
         "success": True,
-        "settings": settings
+        "settings": settings,
     }
 
 
 @router.post("/settings")
 def update_settings(data: dict):
-    email = data.get("email", "demo@startupsense.ai")
+    email = data.get("email")
+
+    if not email:
+        return {
+            "success": False,
+            "message": "Email is required",
+        }
+
     data["updated_at"] = now()
 
     user_settings.update_one(
         {"email": email},
         {"$set": data},
-        upsert=True
+        upsert=True,
     )
 
     return {
         "success": True,
-        "message": "Settings updated successfully"
+        "message": "Settings updated successfully",
     }
 
 
 @router.get("/notifications")
-def get_notifications(email: str = "demo@startupsense.ai"):
+def get_notifications(email: str):
     items = list(notifications.find({"email": email}).sort("created_at", -1))
-
-    if len(items) == 0:
-        default_items = [
-            {
-                "email": email,
-                "title": "System active",
-                "message": "React frontend and FastAPI backend are connected.",
-                "type": "system",
-                "read": False,
-                "created_at": now()
-            },
-            {
-                "email": email,
-                "title": "MongoDB synced",
-                "message": "MongoDB Atlas is storing startup analysis records.",
-                "type": "database",
-                "read": False,
-                "created_at": now()
-            },
-            {
-                "email": email,
-                "title": "AI engine ready",
-                "message": "Gemini AI analysis engine is ready.",
-                "type": "ai",
-                "read": False,
-                "created_at": now()
-            }
-        ]
-
-        notifications.insert_many(default_items)
-        items = list(notifications.find({"email": email}).sort("created_at", -1))
 
     for item in items:
         item["_id"] = str(item["_id"])
 
     return {
         "success": True,
-        "notifications": items
+        "notifications": items,
     }
 
 
@@ -171,32 +189,38 @@ def add_notification(data: dict):
 
     return {
         "success": True,
-        "message": "Notification added"
+        "message": "Notification added",
     }
 
 
 @router.post("/notifications/read")
 def mark_notifications_read(data: dict):
-    email = data.get("email", "demo@startupsense.ai")
+    email = data.get("email")
+
+    if not email:
+        return {
+            "success": False,
+            "message": "Email is required",
+        }
 
     notifications.update_many(
         {"email": email},
-        {"$set": {"read": True}}
+        {"$set": {"read": True}},
     )
 
     return {
         "success": True,
-        "message": "Notifications marked as read"
+        "message": "Notifications marked as read",
     }
 
 
 @router.delete("/notifications")
-def clear_notifications(email: str = "demo@startupsense.ai"):
+def clear_notifications(email: str):
     notifications.delete_many({"email": email})
 
     return {
         "success": True,
-        "message": "Notifications cleared"
+        "message": "Notifications cleared",
     }
 
 
@@ -214,25 +238,24 @@ def system_status():
             "render": "Running",
             "api_version": "2.0.0",
             "records": total_records,
-            "last_sync": now()
-        }
+            "last_sync": now(),
+        },
     }
 
 
 @router.post("/login-history")
 def add_login_history(data: dict):
     data["created_at"] = now()
-
     login_history.insert_one(data)
 
     return {
         "success": True,
-        "message": "Login history added"
+        "message": "Login history added",
     }
 
 
 @router.get("/login-history")
-def get_login_history(email: str = "demo@startupsense.ai"):
+def get_login_history(email: str):
     items = list(login_history.find({"email": email}).sort("created_at", -1))
 
     for item in items:
@@ -240,7 +263,7 @@ def get_login_history(email: str = "demo@startupsense.ai"):
 
     return {
         "success": True,
-        "login_history": items
+        "login_history": items,
     }
 
 
@@ -253,7 +276,7 @@ def change_password(data: dict):
     if not email or not current_password or not new_password:
         return {
             "success": False,
-            "message": "Email, current password, and new password are required"
+            "message": "Email, current password, and new password are required",
         }
 
     existing_user = users.find_one({"email": email})
@@ -261,29 +284,24 @@ def change_password(data: dict):
     if not existing_user:
         return {
             "success": False,
-            "message": "User not found"
+            "message": "User not found",
         }
 
     if not verify_password(current_password, existing_user["password"]):
         return {
             "success": False,
-            "message": "Current password is incorrect"
+            "message": "Current password is incorrect",
         }
 
     users.update_one(
         {"email": email},
-        {"$set": {"password": hash_password(new_password)}}
-    )
-
-    user_profiles.update_one(
-        {"email": email},
-        {"$set": {"last_login": now()}}
+        {"$set": {"password": hash_password(new_password)}},
     )
 
     system_logs.insert_one({
         "email": email,
         "action": "Password Changed",
-        "created_at": now()
+        "created_at": now(),
     })
 
     notifications.insert_one({
@@ -292,12 +310,12 @@ def change_password(data: dict):
         "message": "Your account password was updated successfully.",
         "type": "security",
         "read": False,
-        "created_at": now()
+        "created_at": now(),
     })
 
     return {
         "success": True,
-        "message": "Password changed successfully"
+        "message": "Password changed successfully",
     }
 
 
@@ -309,7 +327,7 @@ def change_email(data: dict):
     if not old_email or not new_email:
         return {
             "success": False,
-            "message": "Old email and new email are required"
+            "message": "Old email and new email are required",
         }
 
     existing_user = users.find_one({"email": old_email})
@@ -317,7 +335,7 @@ def change_email(data: dict):
     if not existing_user:
         return {
             "success": False,
-            "message": "User not found"
+            "message": "User not found",
         }
 
     email_taken = users.find_one({"email": new_email})
@@ -325,38 +343,38 @@ def change_email(data: dict):
     if email_taken:
         return {
             "success": False,
-            "message": "New email is already registered"
+            "message": "New email is already registered",
         }
 
     users.update_one(
         {"email": old_email},
-        {"$set": {"email": new_email}}
+        {"$set": {"email": new_email}},
     )
 
     user_profiles.update_one(
         {"email": old_email},
-        {"$set": {"email": new_email, "updated_at": now()}}
+        {"$set": {"email": new_email, "updated_at": now()}},
     )
 
     user_settings.update_one(
         {"email": old_email},
-        {"$set": {"email": new_email, "updated_at": now()}}
+        {"$set": {"email": new_email, "updated_at": now()}},
     )
 
     notifications.update_many(
         {"email": old_email},
-        {"$set": {"email": new_email}}
+        {"$set": {"email": new_email}},
     )
 
     login_history.update_many(
         {"email": old_email},
-        {"$set": {"email": new_email}}
+        {"$set": {"email": new_email}},
     )
 
     system_logs.insert_one({
         "email": new_email,
         "action": "Email Changed",
-        "created_at": now()
+        "created_at": now(),
     })
 
     notifications.insert_one({
@@ -365,10 +383,10 @@ def change_email(data: dict):
         "message": "Your account email was updated successfully.",
         "type": "security",
         "read": False,
-        "created_at": now()
+        "created_at": now(),
     })
 
     return {
         "success": True,
-        "message": "Email changed successfully"
+        "message": "Email changed successfully",
     }

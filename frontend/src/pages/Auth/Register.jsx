@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Lock, Mail, User } from "lucide-react";
+import { Lock, Mail, User, MapPinned, Map } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function Register({ setMode }) {
@@ -8,13 +8,21 @@ export default function Register({ setMode }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
 
-    if (!name || !email || !password) return;
+    if (!name || !email || !password || !state || !district) return;
 
-    const ok = await register(name, email, password);
+    const ok = await register(
+      name,
+      email,
+      password,
+      state,
+      district
+    );
 
     if (ok) {
       setMode("login");
@@ -32,13 +40,50 @@ export default function Register({ setMode }) {
           </h2>
 
           <p className="mt-3 text-secondary">
-            Start validating startup ideas with AI.
+            Create your personal StartupSense-AI account.
           </p>
 
           <div className="mt-8 space-y-4">
-            <Input icon={User} type="text" placeholder="Full Name" value={name} onChange={setName} />
-            <Input icon={Mail} type="email" placeholder="Email Address" value={email} onChange={setEmail} />
-            <Input icon={Lock} type="password" placeholder="Password" value={password} onChange={setPassword} />
+
+            <Input
+              icon={User}
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={setName}
+            />
+
+            <Input
+              icon={Mail}
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={setEmail}
+            />
+
+            <Input
+              icon={Lock}
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={setPassword}
+            />
+
+            <Input
+              icon={MapPinned}
+              type="text"
+              placeholder="State"
+              value={state}
+              onChange={setState}
+            />
+
+            <Input
+              icon={Map}
+              type="text"
+              placeholder="District"
+              value={district}
+              onChange={setDistrict}
+            />
 
             <button
               disabled={authLoading}
@@ -46,6 +91,7 @@ export default function Register({ setMode }) {
             >
               {authLoading ? "Creating..." : "Create Account"}
             </button>
+
           </div>
 
           <p className="mt-6 text-center text-secondary">
@@ -58,6 +104,7 @@ export default function Register({ setMode }) {
               Login
             </button>
           </p>
+
         </form>
       </div>
     </div>
@@ -68,9 +115,13 @@ function Input({ icon: Icon, type, placeholder, value, onChange }) {
   return (
     <div
       className="flex items-center gap-3 rounded-2xl border px-4 py-4"
-      style={{ borderColor: "var(--border)", background: "var(--card)" }}
+      style={{
+        borderColor: "var(--border)",
+        background: "var(--card)",
+      }}
     >
       <Icon className="h-5 w-5 text-[color:var(--accent-blue)]" />
+
       <input
         type={type}
         placeholder={placeholder}

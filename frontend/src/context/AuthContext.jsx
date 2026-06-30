@@ -36,7 +36,9 @@ export function AuthProvider({ children }) {
     try {
       const res = await fetch(`${API_URL}/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email, password }),
       });
 
@@ -58,20 +60,28 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, state, district) => {
     setAuthLoading(true);
 
     try {
       const res = await fetch(`${API_URL}/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          state,
+          district,
+        }),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        toast.success("Account created. Please login.");
+        toast.success("Account created successfully. Please login.");
         return true;
       }
 

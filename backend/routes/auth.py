@@ -1,10 +1,15 @@
 from fastapi import APIRouter
+from datetime import datetime
 
 from backend.database import users
 from backend.models.user import UserRegister, UserLogin
 from backend.config import hash_password, verify_password
 
 router = APIRouter()
+
+
+def now():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 @router.post("/register")
@@ -20,7 +25,11 @@ def register_user(user: UserRegister):
     users.insert_one({
         "name": user.name,
         "email": user.email,
-        "password": hash_password(user.password)
+        "password": hash_password(user.password),
+        "state": user.state,
+        "district": user.district,
+        "created_at": now(),
+        "last_login": ""
     })
 
     return {
@@ -45,12 +54,23 @@ def login_user(user: UserLogin):
             "message": "Incorrect password"
         }
 
+    login_time = now()
+
+    users.update_one(
+        {"email": user.email},
+        {"$set": {"last_login": login_time}}
+    )
+
     return {
         "success": True,
         "message": "Login successful",
         "user": {
-            "name": existing_user["name"],
-            "email": existing_user["email"]
+            "name": existing_user.get("name", ""),
+            "email": existing_user.get("email", ""),
+            "state": existing_user.get("state", ""),
+            "district": existing_user.get("district", ""),
+            "created_at": existing_user.get("created_at", ""),
+            "last_login": login_time
         }
     }
 
