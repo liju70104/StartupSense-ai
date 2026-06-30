@@ -118,24 +118,65 @@ requirements.txt
 
 ------------------------------------------------------------------------
 
-# 📸 Screenshots
+# 📸 Application Screenshots
 
-Place screenshots in:
+### 🏠 Homepage
 
-``` text
-screenshots/app/
-screenshots/mongodb/
-screenshots/deployment/
-screenshots/github/
-```
+![Homepage](screenshots/app/homepage.png)
 
-Example:
+---
 
-``` md
-![Dashboard](screenshots/app/04-dashboard.png)
-```
+### 🔐 Login
 
-------------------------------------------------------------------------
+![Login](screenshots/app/login%20page.png)
+
+---
+
+### 📝 Register
+
+![Register](screenshots/app/register.png)
+
+---
+
+### 📊 Analyze Startup
+
+![Analyze](screenshots/app/analyze.png)
+
+---
+
+### 📜 History
+
+![History](screenshots/app/history.png)
+
+---
+
+### 👤 User Profile
+
+![Profile](screenshots/app/profile.png)
+
+---
+
+### 📑 Reports
+
+![Reports](screenshots/app/reports.png)
+
+---
+
+### ⚙️ Settings
+
+![Settings](screenshots/app/settings.png)
+
+---
+
+# ☁️ MongoDB Atlas
+
+![MongoDB Setup](screenshots/mongodb/mongodb-setup.png)
+
+---
+
+# 🚀 Deployment
+
+![Deployment](screenshots/deployment/deployement.png)
 
 # ⚙️ Installation
 
