@@ -73,3 +73,20 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+/* Fix dropdown option visibility in dark theme */
+select {
+  color: #ffffff !important;
+  background-color: #252a37 !important;
+  border: 1px solid #4b5563;
+  color-scheme: dark;
+}
+
+select option {
+  color: #ffffff !important;
+  background-color: #252a37 !important;
+}
+
+select option:checked {
+  color: #ffffff !important;
+  background-color: #2563eb !important;
+}
